@@ -17,3 +17,9 @@ impl Ray {
     }
 }
 
+
+impl std::fmt::Display for Ray {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}+t*{}", self.origin, self.direction)
+    }
+}

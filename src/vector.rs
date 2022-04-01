@@ -1,11 +1,4 @@
 
-// #[derive(Debug, Clone, Copy)]
-// pub struct Vector {
-//     pub x: f64,
-//     pub y: f64,
-//     pub z: f64
-// }
-
 #[derive(Debug, Clone, Copy)]
 pub struct Vector {
     pub x: f64,
@@ -19,10 +12,10 @@ impl Vector {
     }
 
     pub fn distance(&self, other: &Vector)-> f64 {
-        let tx = self.x + other.x;
-        let ty = self.y + other.y;
-        let tz = self.z + other.z;
-        (tx*tx + ty*ty + tz*tz).sqrt()
+        let x = other.x - self.x;
+        let y = other.y - self.y;
+        let z = other.z - self.z;
+        (x*x + y*y + z*z).sqrt()
     }
     
     pub fn length(&self) -> f64 {
@@ -30,25 +23,34 @@ impl Vector {
     }
 }
 
-pub fn dot(v1: &Vector, v2: &Vector) -> f64{
+pub fn dot(v1: &Vector, v2: &Vector) -> f64 {
     v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
+}
+
+pub fn cross(v1: &Vector, v2: &Vector) -> Vector {
+    Vector{
+        x: v1.y*v2.z - v1.z*v2.y,
+        y: v1.z*v2.x - v1.x*v2.z,
+        z: v1.x*v2.y - v1.y*v2.x
+    }
 }
 
 impl std::ops::Mul<f64> for Vector {
     type Output = Vector;
     fn mul(self, rhs: f64) -> Vector {
-        // let X = self.x*rhs;
-        // let Y = self.y*rhs;
-        // let Z = self.z*rhs;
-        // Vector::new(X, Y, Z)
         Vector{x: self.x*rhs, y: self.y*rhs, z: self.z*rhs}
     }
 }
-
 impl std::ops::Add for Vector {
     type Output = Vector;
-    fn add(self, other: Vector) -> Vector{
+    fn add(self, other: Vector) -> Vector {
         Vector{x: self.x+other.x, y: self.y+other.y, z: self.z+other.z}
+    }
+}
+impl std::ops::Sub for Vector {
+    type Output = Vector;
+    fn sub(self, other: Vector) -> Vector {
+        Vector{x: self.x-other.x, y: self.y-other.y, z: self.z-other.z}
     }
 }
 
@@ -65,5 +67,4 @@ fn both_len_meth_eq(){
     let len1 = v1.length();
     let len2 = v1.distance(&Vector::new(0.0, 0.0, 0.0));
     assert_eq!(len1, len2);
-
 }
