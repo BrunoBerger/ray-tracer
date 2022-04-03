@@ -17,9 +17,18 @@ impl Vector {
         let z = other.z - self.z;
         (x*x + y*y + z*z).sqrt()
     }
-    
+
     pub fn length(&self) -> f64 {
         (self.x*self.x + self.y*self.y + self.z*self.z).sqrt()
+    }
+
+    pub fn normalise(&self) -> Vector {
+        let len = self.length();
+        Vector {
+            x: self.x / len,
+            y: self.y / len,
+            z: self.z / len
+        }
     }
 }
 
@@ -35,6 +44,13 @@ pub fn cross(v1: &Vector, v2: &Vector) -> Vector {
     }
 }
 
+
+impl std::ops::Neg for Vector {
+    type Output = Vector;
+    fn neg(self) -> Vector {
+        Vector{x: -self.x, y: -self.y, z: -self.z}
+    }
+}
 impl std::ops::Mul<f64> for Vector {
     type Output = Vector;
     fn mul(self, rhs: f64) -> Vector {
@@ -53,7 +69,6 @@ impl std::ops::Sub for Vector {
         Vector{x: self.x-other.x, y: self.y-other.y, z: self.z-other.z}
     }
 }
-
 impl std::fmt::Display for Vector {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "({},{},{})", self.x, self.y, self.z)
