@@ -24,11 +24,7 @@ impl Vector {
 
     pub fn normalise(&self) -> Vector {
         let len = self.length();
-        Vector {
-            x: self.x / len,
-            y: self.y / len,
-            z: self.z / len
-        }
+        *self * (1.0/len)
     }
 }
 
