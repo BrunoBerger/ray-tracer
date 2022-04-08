@@ -1,5 +1,12 @@
 
+use crate::hit;
+use crate::ray;
 use crate::vector::Vector;
+
+pub trait Hittable {
+    fn intersect(&self, ray: ray::Ray) -> Option<hit::Hit>;
+}
+
 
 #[derive(Debug, Clone, Copy)]
 pub struct Hit {
