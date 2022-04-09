@@ -10,12 +10,12 @@ use crate::materials;
 pub struct Sphere {
     center: Vector,
     radius: f64,
-    pub color: materials::Color,
+    pub material: materials::Material,
 }
 
 impl Sphere {
-    pub fn new(center: Vector, radius: f64, color: materials::Color) -> Sphere {
-        Sphere{center, radius, color}
+    pub fn new(center: Vector, radius: f64, material: materials::Material) -> Sphere {
+        Sphere{center, radius, material}
     }
 
     pub fn normal(&self, point: Vector) -> Vector {

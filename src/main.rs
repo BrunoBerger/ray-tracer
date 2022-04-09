@@ -1,12 +1,14 @@
 #![allow(dead_code)]
 // #![allow(unused_variables)]
 
-mod light;
-mod plane;
 mod sphere;
+mod plane;
+mod triangle;
+mod light;
 mod materials;
-mod hit;
 
+mod math;
+mod hit;
 mod ray;
 mod vector;
 
@@ -18,11 +20,11 @@ const MAX_BOUNCES: i32 = 2;
 
 
 struct Scene<T: hit::Hittable> {
-    pub objects: Vec<T>
+    pub objects: Vec<T>,
+    pub light: light::Light,
 }
 
 fn main() {
-
     // Camera setup
     let fov = 90_f64.to_radians();
     let up = Vector::new(0.0, 1.0, 0.0);
@@ -38,16 +40,20 @@ fn main() {
     let grid_height = grid_width;
     let dx = right * (grid_width / (IMAGE_WIDTH-1) as f64);
     let dy = -up * (grid_height / (IMAGE_HEIGHT-1) as f64);
-    let top_left = t - right*(grid_width/2.0) + up*(grid_height/2.0);
+    let top_left = t - right*(grid_width/2.0) + up*(grid_height/2.0); //TODO: normalise ?
 
     // Creating scene
     let red = materials::Color::new(222, 0, 0);
-    let white = materials::Color::new(255, 255, 255);
-    let sphere1 = sphere::Sphere::new(Vector::new(1.0, 0.0, 3.0), 1.0, red);
-    let sphere2 = sphere::Sphere::new(Vector::new(0.0, -155.0, 6.0), 150.0, red);
-    let light = light::Light::new(Vector::new(0.0, 4.0, 2.0), 10.0, white);
+    let green = materials::Color::new(0, 200, 20);
+    let mat_red = materials::Material{ambient_color: red, ..Default::default()};
+    let mat_green = materials::Material{ambient_color: green, ..Default::default()};
+    let sphere1 = sphere::Sphere::new(Vector::new(1.0, 0.0, 3.0), 2.0, mat_red);
+    let sphere2 = sphere::Sphere::new(Vector::new(0.0, -151.0, 6.0), 150.0, mat_green);
     // let plane = plane::Plane::new(up, -4.0);
-    let scene = vec![sphere1, sphere2];
+    let light = light::Light::new(Vector::new(0.0, 4.0, 2.0), 10.0, materials::Color::new(255,255,255));
+
+    // TODO: generic collection?
+    let scene = Scene{objects: vec![sphere1, sphere2], light};
 
     // Shoot ray for each pixel
     let mut buffer: RgbImage = ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -58,21 +64,19 @@ fn main() {
         let mut color = Vector::new(0.0, 0.0, 0.0);
         color = raytrace(&mut color, &scene, pixel_ray, 0);
         
-        *img_pixel = materials::Color::from_vector(color).to_img_RGB();
+        *img_pixel = materials::Color::from_vector(color).to_img_rgb();
     }   
     buffer.save("image.png").unwrap();
 }
 
 
-
-// TODO: create color struct
-fn raytrace(color: &mut Vector, scene: &std::vec::Vec<sphere::Sphere>, ray: ray::Ray, mut depth: i32) -> Vector {
+fn raytrace(color: &mut Vector, scene: &Scene<sphere::Sphere>, ray: ray::Ray, mut depth: i32) -> Vector {
     if depth > MAX_BOUNCES {
         Vector::new(0.0, 0.0, 0.0)
     }
     else {
         let mut max_distance: f64 = f64::MAX;
-        for object in scene {
+        for object in &scene.objects {
             match object.intersect(ray) {
                 None => {},
                 Some(hit) => {
@@ -81,9 +85,22 @@ fn raytrace(color: &mut Vector, scene: &std::vec::Vec<sphere::Sphere>, ray: ray:
                         depth += 1;
 
                         // Color based on normals
-                        let n = hit.normal;
-                        let tmp_c = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
-                        *color = tmp_c*255.0;
+                        // let n = hit.normal;
+                        // let tmp_c = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
+                        // *color = tmp_c*255.0;
+
+                        // let refl_direction = ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction;
+                        // let refl_ray = ray::Ray::new(hit.point, refl_direction);
+                        // let refl_color; //?
+                        // let refl_color = raytrace(refl_color, &scene, refl_ray, depth);
+
+
+                        
+                        // Phong later here
+                        let ca = object.material.ambient_color.to_vector();
+                        let ka = object.material.ambient_intensity;
+                        *color = ca * ka;
+                        
                     }
                 }
             }
