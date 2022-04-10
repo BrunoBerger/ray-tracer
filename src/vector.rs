@@ -53,6 +53,12 @@ impl std::ops::Mul<f64> for Vector {
         Vector{x: self.x*rhs, y: self.y*rhs, z: self.z*rhs}
     }
 }
+impl std::ops::Div<f64> for Vector {
+    type Output = Vector;
+    fn div(self, rhs: f64) -> Vector {
+        self * (1.0/rhs)
+    }
+}
 impl std::ops::Add for Vector {
     type Output = Vector;
     fn add(self, other: Vector) -> Vector {

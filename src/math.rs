@@ -5,6 +5,6 @@ pub fn rndm_in_sphere(center: Vector, radius: i32) -> Vector {
     unimplemented!();
 }
 
-pub fn PhongLighting() -> Vector {
+pub fn phong_lighting() -> Vector {
     unimplemented!();
 }

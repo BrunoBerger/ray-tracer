@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-// #![allow(unused_variables)]
+#![allow(unused_variables)]
 
 mod sphere;
 mod plane;
@@ -35,7 +35,7 @@ fn main() {
     
     // Vectors to next pixel
     const IMAGE_WIDTH: u32 = 300;
-    const IMAGE_HEIGHT: u32 = 300;
+    const IMAGE_HEIGHT: u32 = IMAGE_WIDTH;
     let grid_width = 2.0*((fov/2.0).tan());
     let grid_height = grid_width;
     let dx = right * (grid_width / (IMAGE_WIDTH-1) as f64);
@@ -50,7 +50,7 @@ fn main() {
     let sphere1 = sphere::Sphere::new(Vector::new(1.0, 0.0, 3.0), 2.0, mat_red);
     let sphere2 = sphere::Sphere::new(Vector::new(0.0, -151.0, 6.0), 150.0, mat_green);
     // let plane = plane::Plane::new(up, -4.0);
-    let light = light::Light::new(Vector::new(0.0, 4.0, 2.0), 10.0, materials::Color::new(255,255,255));
+    let light = light::Light::new(Vector::new(-1.0, 2.0, 2.0), 10.0, materials::Color::new(0,0,255));
 
     // TODO: generic collection?
     let scene = Scene{objects: vec![sphere1, sphere2], light};
@@ -94,13 +94,16 @@ fn raytrace(color: &mut Vector, scene: &Scene<sphere::Sphere>, ray: ray::Ray, mu
                         // let refl_color; //?
                         // let refl_color = raytrace(refl_color, &scene, refl_ray, depth);
 
-
-                        
-                        // Phong later here
-                        let ca = object.material.ambient_color.to_vector();
+                        // Phong //TODO: better naming
+                        let ca = object.material.ambient_color.to_vector() / 255.0;
                         let ka = object.material.ambient_intensity;
-                        *color = ca * ka;
-                        
+
+                        let light_dir = (hit.point - scene.light.position).normalise();
+                        let cd = object.material.diffuse_color.to_vector() / 255.0;
+                        let kd = object.material.diffuse_intensity;
+
+                        *color = ca*ka + cd*kd*(vector::dot(&hit.normal, &light_dir));
+                        *color = *color * 255.0;
                     }
                 }
             }

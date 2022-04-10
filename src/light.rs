@@ -4,9 +4,9 @@ use crate::materials;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Light {
-    position: Vector,
-    intensity: f64,
-    color: materials::Color,
+    pub position: Vector,
+    pub intensity: f64,
+    pub color: materials::Color,
 }
 
 impl Light {

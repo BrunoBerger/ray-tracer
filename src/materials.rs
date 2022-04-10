@@ -31,9 +31,9 @@ impl Default for Material {
             ambient_color: white,
             ambient_intensity: 1.0,
             diffuse_color: white,
-            diffuse_intensity: 1.0,
+            diffuse_intensity: 0.5,
             specular_color: white,
-            specular_intensity: 1.0,
+            specular_intensity: 0.5,
         }
     }
 }
