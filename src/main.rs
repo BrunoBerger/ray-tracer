@@ -76,6 +76,10 @@ fn raytrace(color: &mut Vector, scene: &Scene<sphere::Sphere>, ray: ray::Ray, mu
     }
     else {
         let mut max_distance: f64 = f64::MAX;
+        //paint in some fake background
+        let t = 0.5*(ray.direction.y + 1.0);
+        *color = (Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t)*255.0;
+
         for object in &scene.objects {
             match object.intersect(ray) {
                 None => {},
