@@ -3,16 +3,18 @@ use crate::hit;
 use crate::ray;
 use crate::vector;
 use crate::vector::Vector;
+use crate::materials;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Plane {
     normal: Vector,
-    offset: f64
+    offset: f64,
+    pub material: materials::Material,
 }
 
 impl Plane {
-    pub fn new(normal: Vector, offset: f64) -> Plane {
-    Plane{normal, offset}
+    pub fn new(normal: Vector, offset: f64, material: materials::Material) -> Plane {
+    Plane{normal, offset, material}
     }
 }
 

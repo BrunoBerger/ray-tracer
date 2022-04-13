@@ -12,15 +12,16 @@ mod hit;
 mod ray;
 mod vector;
 
+use crate::hit::Hittables;
 use crate::hit::Hittable;
-use image::{RgbImage, ImageBuffer, Rgb};
 use vector::Vector;
 
 const MAX_BOUNCES: i32 = 2;
 
 
-struct Scene<T: hit::Hittable> {
-    pub objects: Vec<T>,
+#[derive(Debug)]
+struct Scene {
+    pub objects: Vec<Hittables>,
     pub light: light::Light,
 }
 
@@ -48,15 +49,20 @@ fn main() {
     let mat_red = materials::Material{ambient_color: red, ..Default::default()};
     let mat_green = materials::Material{ambient_color: green, ..Default::default()};
     let sphere1 = sphere::Sphere::new(Vector::new(1.0, 0.0, 3.0), 2.0, mat_red);
-    let sphere2 = sphere::Sphere::new(Vector::new(0.0, -151.0, 6.0), 150.0, mat_green);
-    // let plane = plane::Plane::new(up, -4.0);
-    let light = light::Light::new(Vector::new(-1.0, 2.0, 2.0), 10.0, materials::Color::new(0,0,255));
-
-    // TODO: generic collection?
-    let scene = Scene{objects: vec![sphere1, sphere2], light};
+    let sphere2 = sphere::Sphere::new(Vector::new(-2.0, -1.0, 6.0), 3.0, mat_red);
+    let plane = plane::Plane::new(up, -2.0, mat_green);
+    let light = light::Light::new(Vector::new(-1.0, 2.0, 1.0), 10.0, materials::Color::new(0,0,255));
+    let scene = Scene{
+        objects: vec![
+            Hittables::Sphere(sphere1), 
+            Hittables::Sphere(sphere2),
+            Hittables::Plane(plane),
+        ], 
+        light
+    };
 
     // Shoot ray for each pixel
-    let mut buffer: RgbImage = ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
+    let mut buffer: image::RgbImage = image::ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
     for (x, y, img_pixel) in buffer.enumerate_pixels_mut(){
         let pixel_vec = top_left + (dx*(x) as f64) + (dy*(y) as f64);
         let pixel_ray = ray::Ray::new(eye, pixel_vec.normalise());
@@ -70,16 +76,16 @@ fn main() {
 }
 
 
-fn raytrace(color: &mut Vector, scene: &Scene<sphere::Sphere>, ray: ray::Ray, mut depth: i32) -> Vector {
+fn raytrace(color: &mut Vector, scene: &Scene, ray: ray::Ray, mut depth: i32) -> Vector {
     if depth > MAX_BOUNCES {
         Vector::new(0.0, 0.0, 0.0)
     }
     else {
-        let mut max_distance: f64 = f64::MAX;
-        //paint in some fake background
+        //paint in some fake default-background
         let t = 0.5*(ray.direction.y + 1.0);
         *color = (Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t)*255.0;
-
+        
+        let mut max_distance: f64 = f64::MAX;
         for object in &scene.objects {
             match object.intersect(ray) {
                 None => {},
@@ -87,24 +93,24 @@ fn raytrace(color: &mut Vector, scene: &Scene<sphere::Sphere>, ray: ray::Ray, mu
                     if hit.t < max_distance {
                         max_distance = hit.t;
                         depth += 1;
-
+                        
                         // Color based on normals
                         // let n = hit.normal;
                         // let tmp_c = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
                         // *color = tmp_c*255.0;
-
+                        
                         // let refl_direction = ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction;
                         // let refl_ray = ray::Ray::new(hit.point, refl_direction);
                         // let refl_color; //?
                         // let refl_color = raytrace(refl_color, &scene, refl_ray, depth);
-
+                        
                         // Phong //TODO: better naming
-                        let ca = object.material.ambient_color.to_vector() / 255.0;
-                        let ka = object.material.ambient_intensity;
+                        let ca = object.material().ambient_color.to_vector() / 255.0;
+                        let ka = object.material().ambient_intensity;
 
                         let light_dir = (hit.point - scene.light.position).normalise();
-                        let cd = object.material.diffuse_color.to_vector() / 255.0;
-                        let kd = object.material.diffuse_intensity;
+                        let cd = object.material().diffuse_color.to_vector() / 255.0;
+                        let kd = object.material().diffuse_intensity;
 
                         *color = ca*ka + cd*kd*(vector::dot(&hit.normal, &light_dir));
                         *color = *color * 255.0;
