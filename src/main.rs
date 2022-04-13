@@ -11,19 +11,13 @@ mod math;
 mod hit;
 mod ray;
 mod vector;
+mod scene;
 
-use crate::hit::Hittables;
 use crate::hit::Hittable;
 use vector::Vector;
 
 const MAX_BOUNCES: i32 = 2;
 
-
-#[derive(Debug)]
-struct Scene {
-    pub objects: Vec<Hittables>,
-    pub light: light::Light,
-}
 
 fn main() {
     // Camera setup
@@ -43,23 +37,7 @@ fn main() {
     let dy = -up * (grid_height / (IMAGE_HEIGHT-1) as f64);
     let top_left = t - right*(grid_width/2.0) + up*(grid_height/2.0); //TODO: normalise ?
 
-    // Creating scene
-    let red = materials::Color::new(222, 0, 0);
-    let green = materials::Color::new(0, 200, 20);
-    let mat_red = materials::Material{ambient_color: red, ..Default::default()};
-    let mat_green = materials::Material{ambient_color: green, ..Default::default()};
-    let sphere1 = sphere::Sphere::new(Vector::new(1.0, 0.0, 3.0), 2.0, mat_red);
-    let sphere2 = sphere::Sphere::new(Vector::new(-2.0, -1.0, 6.0), 3.0, mat_red);
-    let plane = plane::Plane::new(up, -2.0, mat_green);
-    let light = light::Light::new(Vector::new(-1.0, 2.0, 1.0), 10.0, materials::Color::new(0,0,255));
-    let scene = Scene{
-        objects: vec![
-            Hittables::Sphere(sphere1), 
-            Hittables::Sphere(sphere2),
-            Hittables::Plane(plane),
-        ], 
-        light
-    };
+    let scene = scene::get_sample_scene(up);
 
     // Shoot ray for each pixel
     let mut buffer: image::RgbImage = image::ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -76,7 +54,7 @@ fn main() {
 }
 
 
-fn raytrace(color: &mut Vector, scene: &Scene, ray: ray::Ray, mut depth: i32) -> Vector {
+fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, mut depth: i32) -> Vector {
     if depth > MAX_BOUNCES {
         Vector::new(0.0, 0.0, 0.0)
     }
