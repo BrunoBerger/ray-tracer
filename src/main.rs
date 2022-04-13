@@ -1,18 +1,12 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-mod sphere;
-mod plane;
-mod triangle;
-mod light;
-mod materials;
-
-mod math;
 mod hit;
+mod objects;
 mod ray;
 mod vector;
-mod scene;
 
+use crate::objects::*;
 use crate::hit::Hittable;
 use vector::Vector;
 
@@ -64,7 +58,7 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, mut depth: 
         *color = (Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t)*255.0;
         
         let mut max_distance: f64 = f64::MAX;
-        for object in &scene.objects {
+        for object in &scene.hittable_objects {
             match object.intersect(ray) {
                 None => {},
                 Some(hit) => {

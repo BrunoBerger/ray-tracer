@@ -1,15 +1,13 @@
 
-use crate::materials;
-use crate::sphere;
-use crate::light;
-use crate::plane;
+// use crate::materials;
+use crate::objects::*;
 use crate::hit::Hittables;
 use crate::vector::Vector;
 
 
 #[derive(Debug)]
 pub struct Scene {
-    pub objects: Vec<Hittables>,
+    pub hittable_objects: Vec<Hittables>,
     pub light: light::Light,
 }
 
@@ -23,7 +21,7 @@ pub fn get_sample_scene(up: Vector) -> Scene {
     let plane = plane::Plane::new(up, -2.0, mat_green);
     let light = light::Light::new(Vector::new(-1.0, 2.0, 1.0), 10.0, materials::Color::new(0,0,255));
     Scene{
-        objects: vec![
+        hittable_objects: vec![
             Hittables::Sphere(sphere1), 
             Hittables::Sphere(sphere2),
             Hittables::Plane(plane),

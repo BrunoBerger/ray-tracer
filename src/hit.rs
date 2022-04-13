@@ -1,9 +1,7 @@
 
 use crate::ray;
 use crate::vector::Vector;
-use crate::sphere;
-use crate::plane;
-use crate::materials;
+use crate::objects::*;
 
 pub trait Hittable {
     fn intersect(&self, ray: ray::Ray) -> Option<Hit>;
