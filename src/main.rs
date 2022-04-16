@@ -2,6 +2,7 @@
 #![allow(unused_variables)]
 
 mod hit;
+mod math;
 mod objects;
 mod ray;
 mod vector;
@@ -10,7 +11,7 @@ use crate::objects::*;
 use crate::hit::Hittable;
 use vector::Vector;
 
-const MAX_BOUNCES: i32 = 2;
+const MAX_BOUNCES: i32 = 6;
 
 
 fn main() {
@@ -42,20 +43,20 @@ fn main() {
         let mut color = Vector::new(0.0, 0.0, 0.0);
         color = raytrace(&mut color, &scene, pixel_ray, 0);
         
-        *img_pixel = materials::Color::from_vector(color).to_img_rgb();
+        *img_pixel = materials::Color::from_vector(color*255.0).to_img_rgb();
     }   
     buffer.save("image.png").unwrap();
 }
 
 
-fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, mut depth: i32) -> Vector {
+fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
     if depth > MAX_BOUNCES {
         Vector::new(0.0, 0.0, 0.0)
     }
     else {
         //paint in some fake default-background
         let t = 0.5*(ray.direction.y + 1.0);
-        *color = (Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t)*255.0;
+        *color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
         
         let mut max_distance: f64 = f64::MAX;
         for object in &scene.hittable_objects {
@@ -64,17 +65,17 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, mut depth: 
                 Some(hit) => {
                     if hit.t < max_distance {
                         max_distance = hit.t;
-                        depth += 1;
+                        // depth += 1;
                         
                         // Color based on normals
                         // let n = hit.normal;
                         // let tmp_c = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
                         // *color = tmp_c*255.0;
                         
-                        // let refl_direction = ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction;
-                        // let refl_ray = ray::Ray::new(hit.point, refl_direction);
-                        // let refl_color; //?
-                        // let refl_color = raytrace(refl_color, &scene, refl_ray, depth);
+                        let refl_direction = ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction;
+                        let refl_ray = ray::Ray::new(hit.point, refl_direction);
+                        let mut refl_color = Vector::new(0.0, 0.0, 0.0);
+                        let refl_color = raytrace(&mut refl_color, &scene, refl_ray, depth+1);
                         
                         // Phong //TODO: better naming
                         let ca = object.material().ambient_color.to_vector() / 255.0;
@@ -84,8 +85,7 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, mut depth: 
                         let cd = object.material().diffuse_color.to_vector() / 255.0;
                         let kd = object.material().diffuse_intensity;
 
-                        *color = ca*ka + cd*kd*(vector::dot(&hit.normal, &light_dir));
-                        *color = *color * 255.0;
+                        *color = ca*ka + cd*kd*(vector::dot(&hit.normal, &light_dir)) + refl_color*0.2;
                     }
                 }
             }
