@@ -7,7 +7,7 @@ use crate::materials;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Plane {
-    normal: Vector,
+    pub normal: Vector,
     offset: f64,
     pub material: materials::Material,
 }

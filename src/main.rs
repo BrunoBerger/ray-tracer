@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
+// #![allow(unused_variables)]
 
 mod hit;
 mod math;
@@ -58,7 +58,7 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
         let t = 0.5*(ray.direction.y + 1.0);
         *color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
         
-        let mut max_distance: f64 = f64::MAX;
+        let mut max_distance = f64::MAX;
         for object in &scene.hittable_objects {
             match object.intersect(ray) {
                 None => {},
@@ -72,20 +72,29 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                         // let tmp_c = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
                         // *color = tmp_c*255.0;
                         
-                        let refl_direction = ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction;
-                        let refl_ray = ray::Ray::new(hit.point, refl_direction);
-                        let mut refl_color = Vector::new(0.0, 0.0, 0.0);
-                        let refl_color = raytrace(&mut refl_color, &scene, refl_ray, depth+1);
+                        let refl_direction = (ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction).normalise();
+                        // let refl_ray = ray::Ray::new(hit.point, refl_direction);
+                        // let mut refl_color = Vector::new(0.0, 0.0, 0.0);
+                        // let refl_color = raytrace(&mut refl_color, &scene, refl_ray, depth+1);
                         
                         // Phong //TODO: better naming
+                        // Ambient
                         let ca = object.material().ambient_color.to_vector() / 255.0;
                         let ka = object.material().ambient_intensity;
-
+                        let a_part = ca * ka;
+                        // Diffuse
                         let light_dir = (hit.point - scene.light.position).normalise();
                         let cd = object.material().diffuse_color.to_vector() / 255.0;
                         let kd = object.material().diffuse_intensity;
+                        let d_part = cd * kd * (vector::dot(&hit.normal, &light_dir));
+                        // Specular
+                        let cs = object.material().specular_color.to_vector() /255.0;
+                        let ks = object.material().specular_intensity;
+                        let specular_falloff = 2.0;
+                        let s_part = cs * ks * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff);
 
-                        *color = ca*ka + cd*kd*(vector::dot(&hit.normal, &light_dir)) + refl_color*0.2;
+
+                        *color = a_part + d_part + s_part;
                     }
                 }
             }
