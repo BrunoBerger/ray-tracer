@@ -11,7 +11,7 @@ use crate::objects::*;
 use crate::hit::Hittable;
 use vector::Vector;
 
-const MAX_BOUNCES: i32 = 6;
+const MAX_BOUNCES: i32 = 2;
 
 
 fn main() {
@@ -24,7 +24,7 @@ fn main() {
     let right = vector::cross(&up, &t).normalise();
     
     // Vectors to next pixel
-    const IMAGE_WIDTH: u32 = 300;
+    const IMAGE_WIDTH: u32 = 500;
     const IMAGE_HEIGHT: u32 = IMAGE_WIDTH;
     let grid_width = 2.0*((fov/2.0).tan());
     let grid_height = grid_width;
@@ -55,8 +55,8 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
     }
     else {
         //paint in some fake default-background
-        let t = 0.5*(ray.direction.y + 1.0);
-        *color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
+        // let t = 0.5*(ray.direction.y + 1.0);
+        // *color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
         
         let mut max_distance = f64::MAX;
         for object in &scene.hittable_objects {
@@ -69,13 +69,10 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                         
                         // Color based on normals
                         // let n = hit.normal;
-                        // let tmp_c = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
-                        // *color = tmp_c*255.0;
+                        // *color = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
                         
                         let refl_direction = (ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction).normalise();
-                        // let refl_ray = ray::Ray::new(hit.point, refl_direction);
-                        // let mut refl_color = Vector::new(0.0, 0.0, 0.0);
-                        // let refl_color = raytrace(&mut refl_color, &scene, refl_ray, depth+1);
+                        let light_dir = (hit.point - scene.light.position).normalise();
                         
                         // Phong //TODO: better naming
                         // Ambient
@@ -83,18 +80,23 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                         let ka = object.material().ambient_intensity;
                         let a_part = ca * ka;
                         // Diffuse
-                        let light_dir = (hit.point - scene.light.position).normalise();
                         let cd = object.material().diffuse_color.to_vector() / 255.0;
                         let kd = object.material().diffuse_intensity;
                         let d_part = cd * kd * (vector::dot(&hit.normal, &light_dir));
                         // Specular
                         let cs = object.material().specular_color.to_vector() /255.0;
                         let ks = object.material().specular_intensity;
-                        let specular_falloff = 2.0;
-                        let s_part = cs * ks * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff);
-
-
+                        let specular_falloff = 2;
+                        let s_part = cs * ks * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff as f64);
                         *color = a_part + d_part + s_part;
+                        
+                        // Shadow
+                        
+                        // Reflection
+                        let refl_ray = ray::Ray::new(hit.point, refl_direction);
+                        let mut refl_color = Vector::new(0.0, 0.0, 0.0);
+                        let refl_color = raytrace(&mut refl_color, &scene, refl_ray, depth+1);
+                        // *color += refl_color;
                     }
                 }
             }

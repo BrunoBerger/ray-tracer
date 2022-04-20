@@ -26,15 +26,26 @@ impl Material {
 }
 impl Default for Material {
     fn default() -> Material {
+        // TODO google: rust pass value to default trait impl
         let white = Color::new(255, 255, 255);
         Material {
             ambient_color: white,
-            ambient_intensity: 1.0,
+            ambient_intensity: 0.5,
             diffuse_color: white,
-            diffuse_intensity: 0.5,
+            diffuse_intensity: 0.2,
             specular_color: white,
-            specular_intensity: 0.5,
+            specular_intensity: 0.2,
         }
+    }
+}
+pub fn diffuse_from_color(in_color: Color) -> Material{
+    Material{
+        ambient_color: in_color,
+        ambient_intensity: 0.5,
+        diffuse_color: in_color,
+        diffuse_intensity: 0.2,
+        specular_color: in_color,
+        specular_intensity: 0.2,
     }
 }
 

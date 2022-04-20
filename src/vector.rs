@@ -65,6 +65,11 @@ impl std::ops::Add for Vector {
         Vector{x: self.x+other.x, y: self.y+other.y, z: self.z+other.z}
     }
 }
+impl std::ops::AddAssign<Vector> for Vector {
+    fn add_assign(&mut self, other: Vector) {
+        *self = *self + other
+    }
+}
 impl std::ops::Sub for Vector {
     type Output = Vector;
     fn sub(self, other: Vector) -> Vector {

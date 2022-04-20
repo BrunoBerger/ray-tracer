@@ -33,7 +33,7 @@ impl hit::Hittable for Triangle {
         // Implementing: https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/barycentric-coordinates
         // 1. Find intersection with plane of triangle
         match self.plane.intersect(ray) {
-            None => return None,
+            None => None,
             Some(hit) => {
                 // 2. Check if point in triangle
                 let n = self.plane.normal;
