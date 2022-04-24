@@ -15,6 +15,8 @@ const MAX_BOUNCES: i32 = 2;
 
 
 fn main() {
+    let timer_start = std::time::Instant::now();
+
     // Camera setup
     let fov = 90_f64.to_radians();
     let up = Vector::new(0.0, 1.0, 0.0);
@@ -46,6 +48,9 @@ fn main() {
         *img_pixel = materials::Color::from_vector(color*255.0).to_img_rgb();
     }   
     buffer.save("image.png").unwrap();
+
+    let timer_elapsed = timer_start.elapsed();
+    println!("Done in : {:.2?}", timer_elapsed);
 }
 
 
@@ -54,9 +59,9 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
         Vector::new(0.0, 0.0, 0.0)
     }
     else {
-        //paint in some fake default-background
-        // let t = 0.5*(ray.direction.y + 1.0);
-        // *color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
+        // paint in some fake default-background
+        let t = 0.5*(ray.direction.y + 1.0);
+        *color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
         
         let mut max_distance = f64::MAX;
         for object in &scene.hittable_objects {
@@ -71,9 +76,28 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                         // let n = hit.normal;
                         // *color = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
                         
-                        let refl_direction = (ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction).normalise();
                         let light_dir = (hit.point - scene.light.position).normalise();
+
+                        // Shadow
+                        let mut shadow_color = Vector::new(1.0, 1.0, 1.0);
+                        let distance_to_light = hit.point.distance(&scene.light.position);
+                        for s_object in &scene.hittable_objects {
+                            if s_object != object {
+                                match s_object.intersect(ray::Ray::new(hit.point, light_dir)) {
+                                    None => {},
+                                    Some(s_hit) => {
+                                        let temp_t = hit.point.distance(&s_hit.point);
+                                        if temp_t < distance_to_light {
+                                            shadow_color = shadow_color * 0.2;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         
+                        
+                        let refl_direction = (ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction).normalise();
                         // Phong //TODO: better naming
                         // Ambient
                         let ca = object.material().ambient_color.to_vector() / 255.0;
@@ -90,12 +114,15 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                         let s_part = cs * ks * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff as f64);
                         *color = a_part + d_part + s_part;
                         
-                        // Shadow
                         
+
+                        *color = color.scale(shadow_color);
+                        
+
                         // Reflection
-                        let refl_ray = ray::Ray::new(hit.point, refl_direction);
-                        let mut refl_color = Vector::new(0.0, 0.0, 0.0);
-                        let refl_color = raytrace(&mut refl_color, &scene, refl_ray, depth+1);
+                        // let refl_ray = ray::Ray::new(hit.point, refl_direction);
+                        // let mut refl_color = Vector::new(0.0, 0.0, 0.0);
+                        // let refl_color = raytrace(&mut refl_color, &scene, refl_ray, depth+1);
                         // *color += refl_color;
                     }
                 }

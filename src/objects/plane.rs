@@ -5,7 +5,7 @@ use crate::vector;
 use crate::vector::Vector;
 use crate::materials;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Plane {
     pub normal: Vector,
     offset: f64,

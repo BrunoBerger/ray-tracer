@@ -6,8 +6,8 @@ use crate::objects::*;
 pub trait Hittable {
     fn intersect(&self, ray: ray::Ray) -> Option<Hit>;
 }
-
-#[derive(Debug, Clone, Copy)]
+// #[derive(PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Hittables {
     Sphere(sphere::Sphere),
     Plane(plane::Plane),
@@ -43,7 +43,7 @@ pub struct Hit {
 }
 impl Hit {
     pub fn new (t: f64, point: Vector, normal: Vector) -> Hit {
-        Hit{t, point, normal}
+        Hit{t, point, normal: normal.normalise()}
     }
 }
 impl std::fmt::Display for Hit {

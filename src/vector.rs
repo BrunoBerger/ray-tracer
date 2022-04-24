@@ -1,5 +1,5 @@
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector {
     pub x: f64,
     pub y: f64,
@@ -10,21 +10,25 @@ impl Vector {
     pub fn new(x: f64, y: f64, z:f64) -> Vector {
         Vector{x, y, z}
     }
-
     pub fn distance(&self, other: &Vector)-> f64 {
         let x = other.x - self.x;
         let y = other.y - self.y;
         let z = other.z - self.z;
         (x*x + y*y + z*z).sqrt()
     }
-
     pub fn length(&self) -> f64 {
         (self.x*self.x + self.y*self.y + self.z*self.z).sqrt()
     }
-
     pub fn normalise(&self) -> Vector {
         let len = self.length();
         *self * (1.0/len)
+    }
+    pub fn scale(&self, other: Vector) -> Vector {
+        Vector{
+            x: self.x * other.x,
+            y: self.y * other.y,
+            z: self.z * other.z,
+        }
     }
 }
 

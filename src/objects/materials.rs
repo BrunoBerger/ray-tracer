@@ -1,7 +1,7 @@
 
 use crate::vector::Vector;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Material {
     pub ambient_color: Color,
     pub ambient_intensity: f64,
@@ -50,7 +50,7 @@ pub fn diffuse_from_color(in_color: Color) -> Material{
 }
 
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Color {
     pub x: u8,
     pub y: u8,

@@ -6,7 +6,7 @@ use crate::vector::*;
 
 use crate::vector::Vector;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Triangle {
     // points always counterclockwise
     p0: Vector,
