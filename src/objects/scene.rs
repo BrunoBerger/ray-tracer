@@ -17,21 +17,21 @@ pub fn get_sample_scene(up: Vector) -> Scene {
     let mat_green = materials::Material{ambient_color: green, ..Default::default()};
    
     let plane = plane::Plane::new(up, -2.0, mat_green);
-    let sphere1 = sphere::Sphere::new(Vector::new(-2.0, -2.5, 3.0), 1.0, mat_red);
-    // let sphere2 = sphere::Sphere::new(Vector::new(-1.0, -1.0, 4.0), 1.0, mat_red);
+    let sphere1 = sphere::Sphere::new(Vector::new(-2.0, -1.1, 3.0), 1.0, mat_red);
+    let sphere2 = sphere::Sphere::new(Vector::new(-1.0, -1.0, 4.0), 1.0, mat_red);
     let triangle1 = triangle::Triangle::new(
-        Vector::new(0.0, -1.5, 2.0), 
+        Vector::new(0.0, 2.0, 2.0), 
         Vector::new(2.0, -1.0, 2.0), 
-        Vector::new(1.0, -1.0, 4.0),
+        Vector::new(1.0, -1.0, 3.0), //TODO check normals of triangle. smth wrong
         materials::diffuse_from_color(red)
     );
 
-    let light = light::Light::new(Vector::new(0.0, 2.0, 0.0), 1.0, materials::Color::new(0,0,255));
+    let light = light::Light::new(Vector::new(0.0, 3.0, 1.0), 1.0, materials::Color::new(0,0,255));
    
     Scene{
         hittable_objects: vec![
             Hittables::Sphere(sphere1), 
-            // Hittables::Sphere(sphere2),
+            Hittables::Sphere(sphere2),
             Hittables::Plane(plane),
             Hittables::Triangle(triangle1),
         ], 

@@ -6,20 +6,20 @@ use crate::vector::Vector;
 use crate::materials;
 
 #[derive(Debug, Clone, Copy)]
-pub struct Quad {
+pub struct Aabb {
     min: Vector,
     max: Vector,
     pub material: materials::Material,
 }
 
-impl Quad {
-    pub fn new(min: Vector, max: Vector, material: materials::Material) -> Quad {
-        Quad{min, max, material}
+impl Aabb {
+    pub fn new(min: Vector, max: Vector, material: materials::Material) -> Aabb {
+        Aabb{min, max, material}
     }
 }
 
-impl hit::Hittable for Quad {
-    fn intersect(&self, ray: ray::Ray) -> Option<hit::Hit> {
+impl hit::Hittable for Aabb {
+    fn intersect(&self, _ray: ray::Ray) -> Option<hit::Hit> {
         unimplemented!();
     }
 }

@@ -17,7 +17,7 @@ pub struct Triangle {
 }
 impl Triangle {
     pub fn calculate_plane(p0: Vector, p1: Vector, p2: Vector, mat: materials::Material) -> plane::Plane {
-        let normal = -cross( &(p1-p0), &(p2-p0) );
+        let normal = cross( &(p1-p0), &(p2-p0) );
         let offset = normal.x*p0.x + normal.y*p0.y + normal.z*p0.z;
         plane::Plane::new(normal, offset, mat)
     }

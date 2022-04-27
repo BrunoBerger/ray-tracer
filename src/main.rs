@@ -12,7 +12,7 @@ use crate::hit::Hittable;
 use vector::Vector;
 
 const MAX_BOUNCES: i32 = 2;
-const EPSILON: f64 = 0.00000001;
+const EPSILON: f64 = 0.0001;
 
 
 fn main() {
@@ -71,13 +71,14 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                 Some(hit) => {
                     if hit.t < max_distance {
                         max_distance = hit.t;
-                        // depth += 1;
+                        let offset_hit_point = hit.point + hit.normal*crate::EPSILON;
 
                         // Color based on normals
                         let n = hit.normal;
                         *color = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
 
-                        let light_dir = (hit.point - scene.light.position).normalise();
+                        // let light_dir = (hit.point - scene.light.position).normalise();
+                        let light_dir = scene.light.position - hit.point;
                         // let refl_direction = (ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction).normalise();
 
                         // Shadow
@@ -85,7 +86,7 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                         let distance_to_light = hit.point.distance(&scene.light.position);
                         for s_object in &scene.hittable_objects {
                             if s_object != object {
-                                match s_object.intersect(ray::Ray::new(hit.point, light_dir)) {
+                                match s_object.intersect(ray::Ray::new(offset_hit_point, light_dir)) {
                                     None => {},
                                     Some(s_hit) => {
                                         // let temp_t = hit.point.distance(&s_hit.point);
