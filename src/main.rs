@@ -12,6 +12,7 @@ use crate::hit::Hittable;
 use vector::Vector;
 
 const MAX_BOUNCES: i32 = 2;
+const EPSILON: f64 = 0.00000001;
 
 
 fn main() {
@@ -73,10 +74,11 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                         // depth += 1;
                         
                         // Color based on normals
-                        // let n = hit.normal;
-                        // *color = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
+                        let n = hit.normal;
+                        *color = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
                         
                         let light_dir = (hit.point - scene.light.position).normalise();
+                        // let refl_direction = (ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction).normalise();
 
                         // Shadow
                         let mut shadow_color = Vector::new(1.0, 1.0, 1.0);
@@ -86,8 +88,8 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                                 match s_object.intersect(ray::Ray::new(hit.point, light_dir)) {
                                     None => {},
                                     Some(s_hit) => {
-                                        let temp_t = hit.point.distance(&s_hit.point);
-                                        if temp_t < distance_to_light {
+                                        // let temp_t = hit.point.distance(&s_hit.point);
+                                        if s_hit.t > 0.0 && s_hit.t < distance_to_light {
                                             shadow_color = shadow_color * 0.2;
                                             break;
                                         }
@@ -97,22 +99,21 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                         }
                         
                         
-                        let refl_direction = (ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction).normalise();
-                        // Phong //TODO: better naming
-                        // Ambient
-                        let ca = object.material().ambient_color.to_vector() / 255.0;
-                        let ka = object.material().ambient_intensity;
-                        let a_part = ca * ka;
-                        // Diffuse
-                        let cd = object.material().diffuse_color.to_vector() / 255.0;
-                        let kd = object.material().diffuse_intensity;
-                        let d_part = cd * kd * (vector::dot(&hit.normal, &light_dir));
-                        // Specular
-                        let cs = object.material().specular_color.to_vector() /255.0;
-                        let ks = object.material().specular_intensity;
-                        let specular_falloff = 2;
-                        let s_part = cs * ks * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff as f64);
-                        *color = a_part + d_part + s_part;
+                        // // Phong //TODO: better naming
+                        // // Ambient
+                        // let ca = object.material().ambient_color.to_vector() / 255.0;
+                        // let ka = object.material().ambient_intensity;
+                        // let a_part = ca * ka;
+                        // // Diffuse
+                        // let cd = object.material().diffuse_color.to_vector() / 255.0;
+                        // let kd = object.material().diffuse_intensity;
+                        // let d_part = cd * kd * (vector::dot(&hit.normal, &light_dir));
+                        // // Specular
+                        // let cs = object.material().specular_color.to_vector() /255.0;
+                        // let ks = object.material().specular_intensity;
+                        // let specular_falloff = 2;
+                        // let s_part = cs * ks * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff as f64);
+                        // *color = a_part + d_part + s_part;
                         
                         
 

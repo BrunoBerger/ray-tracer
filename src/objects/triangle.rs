@@ -60,7 +60,7 @@ impl hit::Hittable for Triangle {
                     return None
                 }
                 
-                Some(hit::Hit::new(hit.t, hit.point, hit.normal))
+                Some(hit::Hit::new(hit.t, hit.point, n))
             }
         }
     }  
