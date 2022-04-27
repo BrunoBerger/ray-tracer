@@ -20,7 +20,7 @@ impl Sphere {
 
     pub fn normal(&self, point: Vector) -> Vector {
         // Check for validity ?
-        (self.center - point).normalise()
+        (point - self.center).normalise()
     }
 }
 
