@@ -14,7 +14,7 @@ pub struct Plane {
 
 impl Plane {
     pub fn new(normal: Vector, offset: f64, material: materials::Material) -> Plane {
-    Plane{normal, offset, material}
+        Plane{normal, offset, material}
     }
 }
 

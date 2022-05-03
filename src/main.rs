@@ -19,7 +19,7 @@ fn main() {
     let timer_start = std::time::Instant::now();
 
     // Camera setup
-    let fov = 90_f64.to_radians();
+    let fov = 120_f64.to_radians();
     let up = Vector::new(0.0, 1.0, 0.0);
     let eye = Vector::new(0.0, 0.0, -1.0);
     let target = Vector::new(0.0, 0.0, 1.0);
@@ -85,15 +85,18 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                         let mut shadow_color = Vector::new(1.0, 1.0, 1.0);
                         let distance_to_light = hit.point.distance(&scene.light.position);
                         for s_object in &scene.hittable_objects {
-                            if s_object != object {
-                                match s_object.intersect(ray::Ray::new(offset_hit_point, light_dir)) {
-                                    None => {},
-                                    Some(s_hit) => {
-                                        // let temp_t = hit.point.distance(&s_hit.point);
-                                        if s_hit.t > 0.0 && s_hit.t < distance_to_light {
-                                            shadow_color = shadow_color * 0.2;
-                                            break;
-                                        }
+                            // if s_object != object {
+                            // }
+                            // if matches!(s_object, hit::Hittables::Triangle(_)) {
+                            //     println!("test");
+                            // }
+                            match s_object.intersect(ray::Ray::new(offset_hit_point, light_dir)) {
+                                None => {},
+                                Some(s_hit) => {
+                                    // let temp_t = hit.point.distance(&s_hit.point);
+                                    if s_hit.t > 0.0 && s_hit.t < distance_to_light {
+                                        shadow_color = shadow_color * 0.4; //TODO: what here
+                                        break;
                                     }
                                 }
                             }
