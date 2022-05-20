@@ -42,6 +42,10 @@ fn main() {
     for (x, y, img_pixel) in buffer.enumerate_pixels_mut(){
         let pixel_vec = top_left + (dx*(x) as f64) + (dy*(y) as f64);
         let pixel_ray = ray::Ray::new(eye, pixel_vec);
+        
+        if x == 250 && y == 125 {
+            println!("Debug Pixel")
+        }
 
         let mut color = Vector::new(0.0, 0.0, 0.0);
         color = raytrace(&mut color, &scene, pixel_ray, 0);
