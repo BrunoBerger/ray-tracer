@@ -8,7 +8,7 @@ use crate::materials;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Sphere {
-    center: Vector,
+    pub center: Vector,
     radius: f64,
     pub material: materials::Material,
 }

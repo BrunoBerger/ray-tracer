@@ -2,7 +2,7 @@
 // #![allow(unused_variables)]
 
 mod hit;
-mod math;
+mod util;
 mod objects;
 mod ray;
 mod vector;
@@ -19,7 +19,7 @@ fn main() {
     let timer_start = std::time::Instant::now();
 
     // Camera setup
-    let fov = 120_f64.to_radians();
+    let fov = 90_f64.to_radians();
     let up = Vector::new(0.0, 1.0, 0.0);
     let eye = Vector::new(0.0, 0.0, -1.0);
     let target = Vector::new(0.0, 0.0, 1.0);
@@ -41,7 +41,7 @@ fn main() {
     let mut buffer: image::RgbImage = image::ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
     for (x, y, img_pixel) in buffer.enumerate_pixels_mut(){
         let pixel_vec = top_left + (dx*(x) as f64) + (dy*(y) as f64);
-        let pixel_ray = ray::Ray::new(eye, pixel_vec.normalise());
+        let pixel_ray = ray::Ray::new(eye, pixel_vec);
 
         let mut color = Vector::new(0.0, 0.0, 0.0);
         color = raytrace(&mut color, &scene, pixel_ray, 0);
@@ -85,26 +85,23 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                         let mut shadow_color = Vector::new(1.0, 1.0, 1.0);
                         let distance_to_light = hit.point.distance(&scene.light.position);
                         for s_object in &scene.hittable_objects {
-                            // if s_object != object {
-                            // }
-                            // if matches!(s_object, hit::Hittables::Triangle(_)) {
-                            //     println!("test");
-                            // }
-                            match s_object.intersect(ray::Ray::new(offset_hit_point, light_dir)) {
-                                None => {},
-                                Some(s_hit) => {
-                                    // let temp_t = hit.point.distance(&s_hit.point);
-                                    if s_hit.t > 0.0 && s_hit.t < distance_to_light {
-                                        shadow_color = shadow_color * 0.4; //TODO: what here
-                                        break;
+                            if s_object != object {
+                                match s_object.intersect(ray::Ray::new(offset_hit_point, light_dir)) {
+                                    None => {},
+                                    Some(s_hit) => {
+                                        // let temp_t = hit.point.distance(&s_hit.point);
+                                        if s_hit.t > 0.0 && s_hit.t < distance_to_light {
+                                            shadow_color = shadow_color * 0.4; //TODO: what here
+                                            break;
+                                        }
                                     }
                                 }
                             }
                         }
 
 
-                        // // Phong //TODO: better naming
-                        // // Ambient
+                        // Phong //TODO: better naming
+                        // Ambient
                         // let ca = object.material().ambient_color.to_vector() / 255.0;
                         // let ka = object.material().ambient_intensity;
                         // let a_part = ca * ka;

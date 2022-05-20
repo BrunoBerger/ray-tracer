@@ -30,22 +30,22 @@ impl Default for Material {
         let white = Color::new(255, 255, 255);
         Material {
             ambient_color: white,
-            ambient_intensity: 0.5,
+            ambient_intensity: 0.2,
             diffuse_color: white,
-            diffuse_intensity: 0.2,
+            diffuse_intensity: 0.1,
             specular_color: white,
-            specular_intensity: 0.2,
+            specular_intensity: 0.1,
         }
     }
 }
 pub fn diffuse_from_color(in_color: Color) -> Material{
     Material{
         ambient_color: in_color,
-        ambient_intensity: 0.5,
+        ambient_intensity: 0.2,
         diffuse_color: in_color,
-        diffuse_intensity: 0.2,
+        diffuse_intensity: 0.1,
         specular_color: in_color,
-        specular_intensity: 0.2,
+        specular_intensity: 0.1,
     }
 }
 
