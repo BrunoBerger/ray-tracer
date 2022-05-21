@@ -13,14 +13,14 @@ pub struct Scene {
 pub fn get_sample_scene(up: Vector) -> Scene {
     let red = materials::Color::new(222, 0, 0);
     let green = materials::Color::new(0, 200, 20);
-    let mat_red = materials::Material{ambient_color: red, ..Default::default()};
-    let mat_green = materials::Material{ambient_color: green, ..Default::default()};
+    let mat_dif_red = materials::diffuse_from_color(red);
+    let mat_dif_green = materials::diffuse_from_color(green);
    
-    let plane_ground = plane::Plane::new(up, 2.0, mat_green);
-    let plane_wall = plane::Plane::new(Vector::new(1.0, 0.0, 0.0), 2.0, mat_green);
-    let sphere1 = sphere::Sphere::new(Vector::new(-2.0, -1.1, 5.0), 1.0, mat_red);
-    let sphere2 = sphere::Sphere::new(Vector::new(2.0, -1.0, 4.0), 1.0, mat_red);
-    let sphere3 = sphere::Sphere::new(Vector::new(0.0, 2.0, 4.5), 1.0, mat_red);
+    let plane_ground = plane::Plane::new(up, 2.0, mat_dif_green);
+    let plane_wall = plane::Plane::new(Vector::new(1.0, 0.0, 0.0), 2.4, materials::diffuse_from_color(materials::Color::new(255, 255, 255)));
+    let sphere1 = sphere::Sphere::new(Vector::new(-2.0, -1.1, 5.0), 1.0, mat_dif_red);
+    let sphere2 = sphere::Sphere::new(Vector::new(2.0, -1.0, 4.0), 1.0, mat_dif_red);
+    let sphere3 = sphere::Sphere::new(Vector::new(0.0, 2.0, 4.5), 1.0, mat_dif_red);
     // let sphere4 = sphere::Sphere::new(sphere3.center, sphere3.center.distance(&sphere2.center), mat_red);
 
     // let triangle1 = triangle::Triangle::new(

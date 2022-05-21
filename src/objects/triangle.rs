@@ -13,15 +13,15 @@ pub struct Triangle {
     p1: Vector,
     p2: Vector,
     plane: plane::Plane,
-    pub material: materials::Material,
+    pub material: materials::BaseMat,
 }
 impl Triangle {
-    pub fn calculate_plane(p0: Vector, p1: Vector, p2: Vector, mat: materials::Material) -> plane::Plane {
+    pub fn calculate_plane(p0: Vector, p1: Vector, p2: Vector, mat: materials::BaseMat) -> plane::Plane {
         let normal = cross( &(p1-p0), &(p2-p1) ).normalise();
         let offset = normal.x*p0.x + normal.y*p0.y + normal.z*p0.z;
         plane::Plane::new(normal, offset, mat)
     }
-    pub fn new(p0: Vector, p1: Vector, p2: Vector, material: materials::Material) -> Triangle {
+    pub fn new(p0: Vector, p1: Vector, p2: Vector, material: materials::BaseMat) -> Triangle {
         let plane = Triangle::calculate_plane(p0, p1, p2, material);
         Triangle{p0, p1, p2, plane, material}
     }

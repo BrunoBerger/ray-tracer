@@ -9,11 +9,11 @@ use crate::materials;
 pub struct Aabb {
     min: Vector,
     max: Vector,
-    pub material: materials::Material,
+    pub material: materials::BaseMat,
 }
 
 impl Aabb {
-    pub fn new(min: Vector, max: Vector, material: materials::Material) -> Aabb {
+    pub fn new(min: Vector, max: Vector, material: materials::BaseMat) -> Aabb {
         Aabb{
             min: Vector::new(
                 f64::min(min.x, max.x),

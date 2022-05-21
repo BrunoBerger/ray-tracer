@@ -43,9 +43,9 @@ fn main() {
         let pixel_vec = top_left + (dx*(x) as f64) + (dy*(y) as f64);
         let pixel_ray = ray::Ray::new(eye, pixel_vec);
         
-        if x == 250 && y == 125 {
-            println!("Debug Pixel")
-        }
+        // if x == 250 && y == 125 {
+        //     println!("Debug Pixel")
+        // }
 
         let mut color = Vector::new(0.0, 0.0, 0.0);
         color = raytrace(&mut color, &scene, pixel_ray, 0);
@@ -55,7 +55,7 @@ fn main() {
     buffer.save("image.png").unwrap();
 
     let timer_elapsed = timer_start.elapsed();
-    println!("Done in : {:.2?}", timer_elapsed);
+    println!("Done in: {:.2?}", timer_elapsed);
 }
 
 
@@ -83,13 +83,14 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
 
                         // let light_dir = (hit.point - scene.light.position).normalise();
                         let light_dir = scene.light.position - hit.point;
-                        // let refl_direction = (ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction).normalise();
+                        let refl_direction = (ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction).normalise();
+                        // let refl_direction = ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction;
 
                         // Shadow
                         let mut shadow_color = Vector::new(1.0, 1.0, 1.0);
                         let distance_to_light = hit.point.distance(&scene.light.position);
                         for s_object in &scene.hittable_objects {
-                            if s_object != object {
+                            if s_object != object { // 
                                 match s_object.intersect(ray::Ray::new(offset_hit_point, light_dir)) {
                                     None => {},
                                     Some(s_hit) => {
@@ -103,22 +104,27 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                             }
                         }
 
+                        match object.material() {
+                            materials::BaseMat::Lambertian(mat) => {
+                                // Phong //TODO: better naming
+                                // Ambient
+                                let ca = mat.ambient_color.to_vector() / 255.0;
+                                let ka = mat.ambient_intensity;
+                                let a_part = ca * ka;
+                                // Diffuse
+                                let cd = mat.diffuse_color.to_vector() / 255.0;
+                                let kd = mat.diffuse_intensity;
+                                let d_part = cd * kd * (vector::dot(&hit.normal, &light_dir));
+                                // Specular
+                                let cs = mat.specular_color.to_vector() /255.0;
+                                let ks = mat.specular_intensity;
+                                let specular_falloff = 2;
+                                let s_part = cs * ks * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff as f64);
+                                *color = a_part + d_part + s_part;
 
-                        // Phong //TODO: better naming
-                        // Ambient
-                        // let ca = object.material().ambient_color.to_vector() / 255.0;
-                        // let ka = object.material().ambient_intensity;
-                        // let a_part = ca * ka;
-                        // // Diffuse
-                        // let cd = object.material().diffuse_color.to_vector() / 255.0;
-                        // let kd = object.material().diffuse_intensity;
-                        // let d_part = cd * kd * (vector::dot(&hit.normal, &light_dir));
-                        // // Specular
-                        // let cs = object.material().specular_color.to_vector() /255.0;
-                        // let ks = object.material().specular_intensity;
-                        // let specular_falloff = 2;
-                        // let s_part = cs * ks * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff as f64);
-                        // *color = a_part + d_part + s_part;
+                            }
+                        }
+                        
 
 
 

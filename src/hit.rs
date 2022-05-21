@@ -16,7 +16,7 @@ pub enum Hittables {
 // Possiblities if this does not work out:
 // https://stackoverflow.com/questions/26378842/how-do-i-overcome-match-arms-with-incompatible-types-for-structs-implementing-sa
 impl Hittables {
-    pub fn material(&self) -> materials::Material {
+    pub fn material(&self) -> materials::BaseMat {
         match *self {
             Hittables::Sphere(obj) => obj.material,
             Hittables::Plane(obj) => obj.material,

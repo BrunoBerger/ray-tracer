@@ -9,11 +9,11 @@ use crate::materials;
 pub struct Plane {
     pub normal: Vector,
     offset: f64,
-    pub material: materials::Material,
+    pub material: materials::BaseMat,
 }
 
 impl Plane {
-    pub fn new(normal: Vector, offset: f64, material: materials::Material) -> Plane {
+    pub fn new(normal: Vector, offset: f64, material: materials::BaseMat) -> Plane {
         Plane{normal: normal.normalise(), offset, material}
     }
 }
