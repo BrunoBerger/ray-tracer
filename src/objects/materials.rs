@@ -3,22 +3,32 @@ use crate::vector::Vector;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum BaseMat {
+    Metal(Metal),
     Lambertian(Lambertian),
+    
 }
 impl BaseMat {
-    // pub fn new_metal () {}
+    pub fn new_metal (albedo: Color) -> BaseMat {
+        BaseMat::Metal( Metal{albedo} )
+    }
     pub fn new_lambertian(
         ambient_color: Color, ambient_intensity: f64,
         diffuse_color: Color, diffuse_intensity: f64,
         specular_color: Color, specular_intensity: f64
-    ) -> Lambertian {
-        Lambertian{
+    ) -> BaseMat {
+        BaseMat::Lambertian( Lambertian{
             ambient_color, ambient_intensity,
             diffuse_color, diffuse_intensity,
             specular_color, specular_intensity
-        }
+        })
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Metal {
+    pub albedo: Color,
+}
+
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Lambertian {
@@ -30,20 +40,7 @@ pub struct Lambertian {
     pub specular_intensity: f64,
 
 }
-// impl Default for Lambertian {
-//     fn default() -> Lambertian {
-//         // TODO google: rust pass value to default trait impl
-//         let white = Color::new(255, 255, 255);
-//         Lambertian {
-//             ambient_color: white,
-//             ambient_intensity: 0.2,
-//             diffuse_color: white,
-//             diffuse_intensity: 0.1,
-//             specular_color: white,
-//             specular_intensity: 0.1,
-//         }
-//     }
-// }
+
 pub fn diffuse_from_color(in_color: Color) -> BaseMat {
     BaseMat::Lambertian( Lambertian {
             ambient_color: in_color,

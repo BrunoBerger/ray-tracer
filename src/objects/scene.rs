@@ -17,9 +17,9 @@ pub fn get_sample_scene(up: Vector) -> Scene {
     let mat_dif_green = materials::diffuse_from_color(green);
    
     let plane_ground = plane::Plane::new(up, 2.0, mat_dif_green);
-    let plane_wall = plane::Plane::new(Vector::new(1.0, 0.0, 0.0), 2.4, materials::diffuse_from_color(materials::Color::new(255, 255, 255)));
+    let plane_wall = plane::Plane::new(Vector::new(1.0, 0.0, 0.0), 2.4, materials::diffuse_from_color(materials::Color::new(0, 255, 255)));
     let sphere1 = sphere::Sphere::new(Vector::new(-2.0, -1.1, 5.0), 1.0, mat_dif_red);
-    let sphere2 = sphere::Sphere::new(Vector::new(2.0, -1.0, 4.0), 1.0, mat_dif_red);
+    let sphere2 = sphere::Sphere::new(Vector::new(2.0, -1.0, 4.0), 1.0, materials::BaseMat::new_metal(red));
     let sphere3 = sphere::Sphere::new(Vector::new(0.0, 2.0, 4.5), 1.0, mat_dif_red);
     // let sphere4 = sphere::Sphere::new(sphere3.center, sphere3.center.distance(&sphere2.center), mat_red);
 

@@ -11,7 +11,7 @@ use crate::objects::*;
 use crate::hit::Hittable;
 use vector::Vector;
 
-const MAX_BOUNCES: i32 = 2;
+const MAX_BOUNCES: i32 = 4;
 const EPSILON: f64 = 0.0001;
 
 
@@ -47,8 +47,8 @@ fn main() {
         //     println!("Debug Pixel")
         // }
 
-        let mut color = Vector::new(0.0, 0.0, 0.0);
-        color = raytrace(&mut color, &scene, pixel_ray, 0);
+        // let mut color = Vector::new(0.0, 0.0, 0.0);
+        let color = raytrace(&scene, pixel_ray, 0);
 
         *img_pixel = materials::Color::from_vector(color*255.0).to_img_rgb();
     }
@@ -59,14 +59,15 @@ fn main() {
 }
 
 
-fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
+fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
+    let mut color = Vector::new(0.0, 0.0, 0.0);
     if depth > MAX_BOUNCES {
         Vector::new(0.0, 0.0, 0.0)
     }
     else {
         // paint in some fake default-background
-        let t = 0.5*(ray.direction.y + 1.0);
-        *color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
+        // let t = 0.5*(ray.direction.y + 1.0);
+        // color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
 
         let mut max_distance = f64::MAX;
         for object in &scene.hittable_objects {
@@ -78,13 +79,11 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                         let offset_hit_point = hit.point + hit.normal*crate::EPSILON;
 
                         // Color based on normals
-                        let n = hit.normal;
-                        *color = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
+                        // let n = hit.normal;
+                        // color = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
 
-                        // let light_dir = (hit.point - scene.light.position).normalise();
                         let light_dir = scene.light.position - hit.point;
-                        let refl_direction = (ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction).normalise();
-                        // let refl_direction = ray.direction*2.0*vector::dot(&ray.direction, &hit.normal) - ray.direction;
+                        let refl_direction = ray.direction - hit.normal * vector::dot(&ray.direction, &hit.normal) * 2.0;
 
                         // Shadow
                         let mut shadow_color = Vector::new(1.0, 1.0, 1.0);
@@ -116,30 +115,25 @@ fn raytrace(color: &mut Vector, scene: &scene::Scene, ray: ray::Ray, depth: i32)
                                 let kd = mat.diffuse_intensity;
                                 let d_part = cd * kd * (vector::dot(&hit.normal, &light_dir));
                                 // Specular
-                                let cs = mat.specular_color.to_vector() /255.0;
+                                let cs = mat.specular_color.to_vector() / 255.0;
                                 let ks = mat.specular_intensity;
                                 let specular_falloff = 2;
                                 let s_part = cs * ks * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff as f64);
-                                *color = a_part + d_part + s_part;
-
+                                color = a_part + d_part + s_part;
+                            }
+                            materials::BaseMat::Metal(_mat) => {
+                                let refl_ray = ray::Ray::new(offset_hit_point, refl_direction);
+                                // let refl_color = Vector::new(0.0, 1.0, 0.0);
+                                let refl_color = raytrace(&scene, refl_ray, depth+1);
+                                color = refl_color;
                             }
                         }
                         
-
-
-
-                        *color = color.scale(shadow_color);
-
-
-                        // Reflection
-                        // let refl_ray = ray::Ray::new(hit.point, refl_direction);
-                        // let mut refl_color = Vector::new(0.0, 0.0, 0.0);
-                        // let refl_color = raytrace(&mut refl_color, &scene, refl_ray, depth+1);
-                        // *color += refl_color;
+                        color = color.scale(shadow_color);
                     }
                 }
             }
         }
-        *color
+        color
     }
 }
