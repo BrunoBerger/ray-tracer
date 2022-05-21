@@ -1,4 +1,6 @@
 
+use rand::Rng;
+
 use crate::objects::*;
 use crate::hit::Hittables;
 use crate::vector::Vector;
@@ -13,13 +15,15 @@ pub struct Scene {
 pub fn get_sample_scene(up: Vector) -> Scene {
     let red = materials::Color::new(222, 0, 0);
     let green = materials::Color::new(0, 200, 20);
+    let blue = materials::Color::new(0, 255, 255);
     let mat_dif_red = materials::diffuse_from_color(red);
     let mat_dif_green = materials::diffuse_from_color(green);
+    let mat_metal = materials::BaseMat::new_metal(blue);
    
     let plane_ground = plane::Plane::new(up, 2.0, mat_dif_green);
-    let plane_wall = plane::Plane::new(Vector::new(1.0, 0.0, 0.0), 2.4, materials::diffuse_from_color(materials::Color::new(0, 255, 255)));
-    let sphere1 = sphere::Sphere::new(Vector::new(-2.0, -1.1, 5.0), 1.0, mat_dif_red);
-    let sphere2 = sphere::Sphere::new(Vector::new(2.0, -1.0, 4.0), 1.0, materials::BaseMat::new_metal(red));
+    let plane_wall = plane::Plane::new(Vector::new(1.0, 0.0, 0.0), 2.4, materials::diffuse_from_color(blue));
+    let sphere1 = sphere::Sphere::new(Vector::new(-2.0, -1.1, 5.0), 2.0, mat_metal);
+    let sphere2 = sphere::Sphere::new(Vector::new(2.0, -1.0, 4.0), 1.5, mat_metal);
     let sphere3 = sphere::Sphere::new(Vector::new(0.0, 2.0, 4.5), 1.0, mat_dif_red);
     // let sphere4 = sphere::Sphere::new(sphere3.center, sphere3.center.distance(&sphere2.center), mat_red);
 
@@ -53,5 +57,42 @@ pub fn get_sample_scene(up: Vector) -> Scene {
             // Hittables::Triangle(triangle2),
         ], 
         light
+    }
+}
+
+pub fn random_sphere_scene() -> Scene {
+    let mut hittable_objects = Vec::new();
+    let mut rng = rand::thread_rng();
+
+    let red = materials::Color::new(222, 0, 0);
+
+    let mat_metal = materials::BaseMat::new_metal(red);
+
+    let plane_ground = plane::Plane::new(Vector::new(0.0, 1.0, 0.0), 0.1, mat_metal);
+    hittable_objects.push(Hittables::Plane(plane_ground));
+
+    for _ in 0 .. 500 {
+        let new_pos =Vector::new(
+            rng.gen_range(-6.0 .. 6.0),
+            rng.gen_range(0.0 .. 6.0),
+            rng.gen_range(4.0 .. 40.0)
+        );
+        let new_mat = materials::diffuse_from_color(materials::Color::new(
+            rng.gen_range(0 .. 255),
+            rng.gen_range(0 .. 255),
+            rng.gen_range(0 .. 255)
+        ));
+        let new_sphere = Hittables::Sphere(sphere::Sphere::new(
+            new_pos,
+            rng.gen_range(0.2 .. 1.0),
+            new_mat
+        ));
+        hittable_objects.push(new_sphere);
+    }
+
+    let light = light::Light::new(Vector::new(0.0, 0.0, 0.0), 1.0, materials::Color::new(0,0,255));
+    Scene{
+        hittable_objects,
+        light,
     }
 }

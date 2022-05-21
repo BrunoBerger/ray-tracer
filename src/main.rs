@@ -35,7 +35,8 @@ fn main() {
     let dy = -up * (grid_height / (IMAGE_HEIGHT-1) as f64);
     let top_left = t - right*(grid_width/2.0) + up*(grid_height/2.0); //TODO: normalise ?
 
-    let scene = scene::get_sample_scene(up);
+    // let scene = scene::get_sample_scene(up);
+    let scene = scene::random_sphere_scene();
 
     // Shoot ray for each pixel
     let mut buffer: image::RgbImage = image::ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -47,7 +48,6 @@ fn main() {
         //     println!("Debug Pixel")
         // }
 
-        // let mut color = Vector::new(0.0, 0.0, 0.0);
         let color = raytrace(&scene, pixel_ray, 0);
 
         *img_pixel = materials::Color::from_vector(color*255.0).to_img_rgb();
@@ -64,7 +64,7 @@ fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
     if depth > MAX_BOUNCES {
         Vector::new(0.0, 0.0, 0.0)
     }
-    else {
+    else { 
         // paint in some fake default-background
         // let t = 0.5*(ray.direction.y + 1.0);
         // color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
