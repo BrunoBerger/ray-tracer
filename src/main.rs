@@ -47,6 +47,9 @@ fn main() {
         // if x == 250 && y == 125 {
         //     println!("Debug Pixel")
         // }
+        // if y % 500 == 0 && x == 0{
+        //     println!("Completed {y} lines")
+        // }
 
         let color = raytrace(&scene, pixel_ray, 0);
 
@@ -60,14 +63,14 @@ fn main() {
 
 
 fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
-    let mut color = Vector::new(0.0, 0.0, 0.0);
+    // let mut color = Vector::new(0.0, 0.0, 0.0);
     if depth > MAX_BOUNCES {
         Vector::new(0.0, 0.0, 0.0)
     }
     else { 
         // paint in some fake default-background
-        // let t = 0.5*(ray.direction.y + 1.0);
-        // color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
+        let t = 0.5*(ray.direction.y + 1.0);
+        let mut color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
 
         let mut max_distance = f64::MAX;
         for object in &scene.hittable_objects {
@@ -123,7 +126,6 @@ fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
                             }
                             materials::BaseMat::Metal(_mat) => {
                                 let refl_ray = ray::Ray::new(offset_hit_point, refl_direction);
-                                // let refl_color = Vector::new(0.0, 1.0, 0.0);
                                 let refl_color = raytrace(&scene, refl_ray, depth+1);
                                 color = refl_color;
                             }
