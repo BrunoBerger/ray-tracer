@@ -2,7 +2,6 @@
 // #![allow(unused_variables)]
 
 mod hit;
-mod util;
 mod objects;
 mod ray;
 mod vector;
@@ -30,10 +29,10 @@ fn main() {
     const IMAGE_WIDTH: u32 = 500;
     const IMAGE_HEIGHT: u32 = IMAGE_WIDTH;
     let grid_width = 2.0*((fov/2.0).tan());
-    let grid_height = grid_width;
+    let grid_height = grid_width / (IMAGE_WIDTH/IMAGE_HEIGHT) as f64;
     let dx = right * (grid_width / (IMAGE_WIDTH-1) as f64);
     let dy = -up * (grid_height / (IMAGE_HEIGHT-1) as f64);
-    let top_left = t - right*(grid_width/2.0) + up*(grid_height/2.0); //TODO: normalise ?
+    let top_left = t - right*(grid_width/2.0) + up*(grid_height/2.0);
 
     // let scene = scene::get_sample_scene(up);
     let scene = scene::random_sphere_scene();
@@ -43,10 +42,7 @@ fn main() {
     for (x, y, img_pixel) in buffer.enumerate_pixels_mut(){
         let pixel_vec = top_left + (dx*(x) as f64) + (dy*(y) as f64);
         let pixel_ray = ray::Ray::new(eye, pixel_vec);
-        
-        // if x == 250 && y == 125 {
-        //     println!("Debug Pixel")
-        // }
+
         // if y % 500 == 0 && x == 0{
         //     println!("Completed {y} lines")
         // }
@@ -67,7 +63,7 @@ fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
     if depth > MAX_BOUNCES {
         Vector::new(0.0, 0.0, 0.0)
     }
-    else { 
+    else {
         // paint in some fake default-background
         let t = 0.5*(ray.direction.y + 1.0);
         let mut color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
@@ -92,7 +88,7 @@ fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
                         let mut shadow_color = Vector::new(1.0, 1.0, 1.0);
                         let distance_to_light = hit.point.distance(&scene.light.position);
                         for s_object in &scene.hittable_objects {
-                            if s_object != object { // 
+                            if s_object != object { //
                                 match s_object.intersect(ray::Ray::new(offset_hit_point, light_dir)) {
                                     None => {},
                                     Some(s_hit) => {
@@ -130,7 +126,7 @@ fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
                                 color = refl_color;
                             }
                         }
-                        
+
                         color = color.scale(shadow_color);
                     }
                 }

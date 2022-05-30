@@ -6,7 +6,7 @@ use crate::objects::*;
 pub trait Hittable {
     fn intersect(&self, ray: ray::Ray) -> Option<Hit>;
 }
-// #[derive(PartialEq)]
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Hittables {
     Sphere(sphere::Sphere),

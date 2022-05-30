@@ -29,7 +29,7 @@ impl hit::Hittable for Sphere {
         // Build quadratic equasion: 0 = ax^2 + bx + c
         let orign_to_center = ray.origin - self.center;
         let a = 1.0; //if ray.dir not normalised: vector::dot(&ray.direction, &ray.direction
-        let b = (vector::dot(&ray.direction, &orign_to_center)) * 2.0;
+        let b = vector::dot(&ray.direction, &orign_to_center) * 2.0;
         let c = vector::dot(&orign_to_center, &orign_to_center) - self.radius*self.radius;
 
         let discriminant = b*b - 4.0*a*c;

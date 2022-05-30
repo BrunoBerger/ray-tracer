@@ -3,9 +3,14 @@ name = "ray-tracer"
 version = "0.1.0"
 edition = "2021"
 
+[profile.release-with-debug]
+inherits = "release"
+debug = 1
+# Use with 'cargo run --profile=release-with-debug'
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 image = "0.24.1"
 rand = "0.8.5"
-rand_distr = "0.4.3"
+

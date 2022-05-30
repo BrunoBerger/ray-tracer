@@ -1,13 +1,10 @@
 
 use rand::Rng;
-// use rand::seq::IteratorRandom;
 
 use crate::objects::*;
 use crate::hit::Hittables;
 use crate::vector::Vector;
 
-
-#[derive(Debug)]
 pub struct Scene {
     pub hittable_objects: Vec<Hittables>,
     pub light: light::Light,
@@ -82,9 +79,9 @@ pub fn random_sphere_scene() -> Scene {
             rng.gen_range(3.0 .. 20.0)
         );
         let new_mat = materials::diffuse_from_color(materials::Color::new(
-            rng.gen_range(0 .. 255),
-            rng.gen_range(0 .. 255),
-            rng.gen_range(0 .. 255)
+            rng.gen_range(0 ..= 255),
+            rng.gen_range(0 ..= 255),
+            rng.gen_range(0 ..= 255)
         ));
 
         let mats = vec![new_mat, mat_metal];
@@ -92,7 +89,6 @@ pub fn random_sphere_scene() -> Scene {
         let new_sphere = Hittables::Sphere(sphere::Sphere::new(
             new_pos,
             rng.gen_range(0.2 .. 1.0),
-            // mats.choose(&mut rng).unwrap()
             mats[ rng.gen_range(0 ..= 1) ]
         ));
         hittable_objects.push(new_sphere);
