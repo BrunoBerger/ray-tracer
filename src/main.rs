@@ -66,8 +66,8 @@ fn main() {
 
         *img_pixel = materials::Color::from_vector(color*255.0).to_img_rgb();
     }
-    buffer.save("image.png").unwrap();
     
+    buffer.save("image.png").unwrap();
     println!("\nDone in: {:.2?}", timer_start.elapsed());
 }
 

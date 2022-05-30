@@ -73,7 +73,7 @@ pub fn random_sphere_scene() -> Scene {
     hittable_objects.push(Hittables::Plane(plane_ground));
 
     for _ in 0 .. 200 {
-        let new_pos =Vector::new(
+        let new_pos = Vector::new(
             rng.gen_range(-8.0 .. 8.0),
             rng.gen_range(-4.0 .. 6.0),
             rng.gen_range(3.0 .. 20.0)
@@ -95,8 +95,5 @@ pub fn random_sphere_scene() -> Scene {
     }
 
     let light = light::Light::new(Vector::new(5.0, 5.0, 2.0), 1.0, materials::Color::new(0,0,255));
-    Scene{
-        hittable_objects,
-        light,
-    }
+    Scene{hittable_objects, light}
 }

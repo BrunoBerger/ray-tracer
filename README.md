@@ -1,6 +1,7 @@
 # ray-tracer
 For the "Advanced Computer Graphics" module<br>
-[GitHub-Repository](https://github.com/BrunoBerger/ray-tracer)
+[GitHub-Repository](https://github.com/BrunoBerger/ray-tracer)<br>
+[40MB render](https://mega.nz/file/Ig4DRQqJ#_barJn-A4mkj8nPf1Nu6jQ9d-5FUWnygG0p6BIvQkt8)
 
 ## Install
 1. Install rust and cargo, preferably with [rustup](https://www.rust-lang.org/tools/install)

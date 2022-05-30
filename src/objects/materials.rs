@@ -8,7 +8,7 @@ pub enum BaseMat {
     
 }
 impl BaseMat {
-    pub fn new_metal (albedo: Color) -> BaseMat {
+    pub fn new_metal(albedo: Color) -> BaseMat {
         BaseMat::Metal( Metal{albedo} )
     }
     pub fn new_lambertian(
