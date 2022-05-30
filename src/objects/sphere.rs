@@ -19,7 +19,7 @@ impl Sphere {
     }
 
     pub fn normal(&self, point: Vector) -> Vector {
-        // Check for validity ?
+        // TODO: Check for validity ?
         (point - self.center).normalise()
     }
 }
@@ -51,7 +51,6 @@ impl hit::Hittable for Sphere {
             else {
                 return None
             }          
-            // println!("{}{}{}", t0, t1, t);
             let point = ray.at(t);
             let normal = self.normal(point);
             Some(hit::Hit::new(t, point, normal))

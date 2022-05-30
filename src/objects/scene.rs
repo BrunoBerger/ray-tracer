@@ -69,13 +69,13 @@ pub fn random_sphere_scene() -> Scene {
     let mut mats = Vec::new();
     mats.push(mat_metal);
 
-    let plane_ground = plane::Plane::new(Vector::new(0.0, 1.0, 0.0), 3.0, mat_diff);
+    let plane_ground = plane::Plane::new(Vector::new(0.0, 1.0, 0.0), 4.0, mat_diff);
     hittable_objects.push(Hittables::Plane(plane_ground));
 
     for _ in 0 .. 200 {
         let new_pos =Vector::new(
             rng.gen_range(-8.0 .. 8.0),
-            rng.gen_range(-3.0 .. 6.0),
+            rng.gen_range(-4.0 .. 6.0),
             rng.gen_range(3.0 .. 20.0)
         );
         let new_mat = materials::diffuse_from_color(materials::Color::new(

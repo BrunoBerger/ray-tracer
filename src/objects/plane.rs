@@ -25,9 +25,6 @@ impl hit::Hittable for Plane {
         if (n_dot_dir == 0.0) || (t < 0.0) {
             None
         }
-        // else if t > 0.0 {
-        //     Some(hit::Hit::new(t, ray.at(t), self.normal))
-        // }
         else {
             Some(hit::Hit::new(t, ray.at(t), self.normal))
         }
