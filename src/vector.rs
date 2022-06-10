@@ -35,7 +35,6 @@ impl Vector {
 pub fn dot(v1: &Vector, v2: &Vector) -> f64 {
     v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
 }
-
 pub fn cross(v1: &Vector, v2: &Vector) -> Vector {
     Vector{
         x: v1.y*v2.z - v1.z*v2.y,
@@ -55,6 +54,12 @@ impl std::ops::Mul<f64> for Vector {
     type Output = Vector;
     fn mul(self, rhs: f64) -> Vector {
         Vector{x: self.x*rhs, y: self.y*rhs, z: self.z*rhs}
+    }
+}
+impl std::ops::Div<i32> for Vector {
+    type Output = Vector;
+    fn div(self, rhs: i32) -> Vector {
+        self * (1.0/rhs as f64)
     }
 }
 impl std::ops::Div<f64> for Vector {

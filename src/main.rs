@@ -10,6 +10,7 @@ use crate::objects::*;
 use crate::hit::Hittable;
 use vector::Vector;
 
+const SAMPLES: i32 = 4;
 const MAX_BOUNCES: i32 = 4;
 const EPSILON: f64 = 0.0001;
 const DEFAULT_RES: u32 = 500;
@@ -48,23 +49,26 @@ fn main() {
     let top_left = t - right*(grid_width/2.0) + up*(grid_height/2.0);
 
     // let scene = scene::get_sample_scene(up);
-    let scene = scene::random_sphere_scene();
+    // let scene = scene::random_sphere_scene();
+    let scene = scene::path_trace_demo_scene();
 
     // Shoot ray for each pixel
     let mut buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
     for (x, y, img_pixel) in buffer.enumerate_pixels_mut(){
-        let pixel_vec = top_left + (dx*(x) as f64) + (dy*(y) as f64);
-        let pixel_ray = ray::Ray::new(eye, pixel_vec);
+        let mut color = Vector::new(0.0, 0.0, 0.0);
+        for _ in 0 .. SAMPLES {
+            let pixel_vec = top_left + (dx*(x) as f64) + (dy*(y) as f64);
+            let pixel_ray = ray::Ray::new(eye, pixel_vec);
+            color += raytrace(&scene, pixel_ray, 0);
+
+        }
+        *img_pixel = materials::Color::from_vector(color / SAMPLES * 255.0).to_img_rgb();
 
         // Progress report every 10%
-        if y % (image_height / 10) == 0 {
-            print!("\r{} rows remaining ", image_height-y);
-            std::io::Write::flush(&mut std::io::stdout()).unwrap();
-        }
-
-        let color = raytrace(&scene, pixel_ray, 0);
-
-        *img_pixel = materials::Color::from_vector(color*255.0).to_img_rgb();
+        // if y % (image_height / 10) == 0 {
+        //     print!("\r{} rows remaining ", image_height-y);
+        //     std::io::Write::flush(&mut std::io::stdout()).unwrap();
+        // }
     }
     
     buffer.save("image.png").unwrap();
@@ -129,8 +133,8 @@ fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
                                 // Speculardk
                                 let sc = mat.specular_color.to_vector() / 255.0;
                                 let sk = mat.specular_intensity;
-                                let specular_falloff = 2;
-                                let s_part = sc * sk * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff as f64);
+                                let specular_falloff = 2_f64;
+                                let s_part = sc * sk * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff);
                                 color = a_part + d_part + s_part;
                             }
                             materials::BaseMat::Metal(_mat) => {

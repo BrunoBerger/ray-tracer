@@ -97,3 +97,38 @@ pub fn random_sphere_scene() -> Scene {
     let light = light::Light::new(Vector::new(5.0, 5.0, 2.0), 1.0, materials::Color::new(0,0,255));
     Scene{hittable_objects, light}
 }
+
+pub fn path_trace_demo_scene() -> Scene {
+    let mut hittable_objects = Vec::new();
+
+    let white = materials::Color::new(255, 255, 255);
+    let red = materials::Color::new(255, 0, 0);
+    let green = materials::Color::new(0, 255, 0);
+    let gray = materials::Color::new(180, 180, 180);
+
+    let diff_white = materials::diffuse_from_color(white);
+    let diff_red = materials::diffuse_from_color(red);
+    let diff_green = materials::diffuse_from_color(green);
+    let diff_gray = materials::diffuse_from_color(gray);
+    let metal_mat = materials::BaseMat::new_metal(white);
+
+    let ground_plane = plane::Plane::new(Vector::new(0.0, 1.0, 0.0), 4.0, diff_white);
+    let celing_plane = plane::Plane::new(Vector::new(0.0, -1.0, 0.0), 4.0, diff_white);
+    let back_wall = plane::Plane::new(Vector::new(0.0, 0.0, -1.0), 8.0, diff_white);
+    let left_wall = plane::Plane::new(Vector::new(1.0, 0.0, 0.0), 4.0, diff_red);
+    let right_wall = plane::Plane::new(Vector::new(-1.0, 0.0, 0.0), 4.0, diff_green);
+    
+    let metal_sphere = sphere::Sphere::new(Vector::new(1.2, -3.5, 5.0), 1.0, metal_mat);
+    let diff_spehre = sphere::Sphere::new(Vector::new(-1.2, -4.0, 5.0), 1.0, diff_gray);
+
+    hittable_objects.push( Hittables::Plane(ground_plane) );
+    hittable_objects.push( Hittables::Plane(celing_plane) );
+    hittable_objects.push( Hittables::Plane(back_wall) );
+    hittable_objects.push( Hittables::Plane(left_wall) );
+    hittable_objects.push( Hittables::Plane(right_wall) );
+    hittable_objects.push( Hittables::Sphere(metal_sphere) );
+    hittable_objects.push( Hittables::Sphere(diff_spehre) );
+
+    let light = light::Light::new(Vector::new(3.0, 3.0, 2.0), 1.0, materials::Color::new(0,0,255));
+    Scene{hittable_objects, light}
+}
