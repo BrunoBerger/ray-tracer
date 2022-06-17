@@ -5,6 +5,7 @@ mod hit;
 mod objects;
 mod ray;
 mod vector;
+mod util;
 
 use crate::objects::*;
 use crate::hit::Hittable;
@@ -136,6 +137,20 @@ fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
                                 let specular_falloff = 2_f64;
                                 let s_part = sc * sk * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff);
                                 color = a_part + d_part + s_part;
+
+
+                                // Scattering
+                                let mut indirect_color = Vector::new(0.0, 0.0, 0.0);
+                                for _ in 0..crate::SAMPLES {
+                                    let scatter_ray = ray::Ray::new(
+                                        offset_hit_point,
+                                        hit.normal + util::rndm_on_sphere()
+                                    );
+                                    indirect_color += raytrace(&scene, scatter_ray, depth+2)
+                                }
+                                indirect_color = indirect_color / crate::SAMPLES;
+
+                                color.scale(indirect_color*0.2);
                             }
                             materials::BaseMat::Metal(_mat) => {
                                 let refl_ray = ray::Ray::new(offset_hit_point, refl_direction);
