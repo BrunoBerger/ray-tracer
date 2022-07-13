@@ -8,12 +8,12 @@ use crate::materials;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Plane {
     pub normal: Vector,
-    offset: f64,
+    offset: f32,
     pub material: materials::BaseMat,
 }
 
 impl Plane {
-    pub fn new(normal: Vector, offset: f64, material: materials::BaseMat) -> Plane {
+    pub fn new(normal: Vector, offset: f32, material: materials::BaseMat) -> Plane {
         Plane{normal: normal.normalise(), offset, material}
     }
 }

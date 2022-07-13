@@ -16,14 +16,14 @@ impl Aabb {
     pub fn new(min: Vector, max: Vector, material: materials::BaseMat) -> Aabb {
         Aabb{
             min: Vector::new(
-                f64::min(min.x, max.x),
-                f64::min(min.y, max.y),
-                f64::min(min.z, max.z)
+                f32::min(min.x, max.x),
+                f32::min(min.y, max.y),
+                f32::min(min.z, max.z)
             ), 
             max: Vector::new(
-                f64::max(min.x, max.x),
-                f64::max(min.y, max.y),
-                f64::max(min.z, max.z)
+                f32::max(min.x, max.x),
+                f32::max(min.y, max.y),
+                f32::max(min.z, max.z)
             ), 
             material
         }

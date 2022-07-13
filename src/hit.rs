@@ -37,12 +37,12 @@ impl Hittable for Hittables {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Hit {
-    pub t: f64,
+    pub t: f32,
     pub point: Vector,
     pub normal: Vector,
 }
 impl Hit {
-    pub fn new (t: f64, point: Vector, normal: Vector) -> Hit {
+    pub fn new (t: f32, point: Vector, normal: Vector) -> Hit {
         Hit{t, point, normal: normal.normalise()}
     }
 }

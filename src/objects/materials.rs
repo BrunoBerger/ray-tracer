@@ -12,9 +12,9 @@ impl BaseMat {
         BaseMat::Metal( Metal{albedo} )
     }
     pub fn new_lambertian(
-        ambient_color: Color, ambient_intensity: f64,
-        diffuse_color: Color, diffuse_intensity: f64,
-        specular_color: Color, specular_intensity: f64
+        ambient_color: Color, ambient_intensity: f32,
+        diffuse_color: Color, diffuse_intensity: f32,
+        specular_color: Color, specular_intensity: f32
     ) -> BaseMat {
         BaseMat::Lambertian( Lambertian{
             ambient_color, ambient_intensity,
@@ -33,11 +33,11 @@ pub struct Metal {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Lambertian {
     pub ambient_color: Color,
-    pub ambient_intensity: f64,
+    pub ambient_intensity: f32,
     pub diffuse_color: Color,
-    pub diffuse_intensity: f64,
+    pub diffuse_intensity: f32,
     pub specular_color: Color,
-    pub specular_intensity: f64,
+    pub specular_intensity: f32,
 
 }
 
@@ -72,7 +72,7 @@ impl Color {
         }
     }
     pub fn to_vector(&self) -> Vector {
-        Vector::new(self.x as f64, self.y as f64, self.z as f64)
+        Vector::new(self.x as f32, self.y as f32, self.z as f32)
     }
     pub fn to_img_rgb(&self) -> image::Rgb<u8> {
         image::Rgb([self.x, self.y, self.z])

@@ -12,7 +12,7 @@ impl Ray {
         Ray{origin, direction: direction.normalise()}
     }
 
-    pub fn at (&self, t: f64) -> Vector {
+    pub fn at (&self, t: f32) -> Vector {
         self.origin + self.direction*t
     }
 }

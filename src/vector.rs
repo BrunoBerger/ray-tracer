@@ -1,22 +1,22 @@
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64
+    pub x: f32,
+    pub y: f32,
+    pub z: f32
 }
 
 impl Vector {
-    pub fn new(x: f64, y: f64, z:f64) -> Vector {
+    pub fn new(x: f32, y: f32, z:f32) -> Vector {
         Vector{x, y, z}
     }
-    pub fn distance(&self, other: &Vector)-> f64 {
+    pub fn distance(&self, other: &Vector)-> f32 {
         let x = other.x - self.x;
         let y = other.y - self.y;
         let z = other.z - self.z;
         (x*x + y*y + z*z).sqrt()
     }
-    pub fn length(&self) -> f64 {
+    pub fn length(&self) -> f32 {
         (self.x*self.x + self.y*self.y + self.z*self.z).sqrt()
     }
     pub fn normalise(&self) -> Vector {
@@ -32,7 +32,7 @@ impl Vector {
     }
 }
 
-pub fn dot(v1: &Vector, v2: &Vector) -> f64 {
+pub fn dot(v1: &Vector, v2: &Vector) -> f32 {
     v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
 }
 pub fn cross(v1: &Vector, v2: &Vector) -> Vector {
@@ -50,21 +50,21 @@ impl std::ops::Neg for Vector {
         Vector{x: -self.x, y: -self.y, z: -self.z}
     }
 }
-impl std::ops::Mul<f64> for Vector {
+impl std::ops::Mul<f32> for Vector {
     type Output = Vector;
-    fn mul(self, rhs: f64) -> Vector {
+    fn mul(self, rhs: f32) -> Vector {
         Vector{x: self.x*rhs, y: self.y*rhs, z: self.z*rhs}
     }
 }
 impl std::ops::Div<i32> for Vector {
     type Output = Vector;
     fn div(self, rhs: i32) -> Vector {
-        self * (1.0/rhs as f64)
+        self * (1.0/rhs as f32)
     }
 }
-impl std::ops::Div<f64> for Vector {
+impl std::ops::Div<f32> for Vector {
     type Output = Vector;
-    fn div(self, rhs: f64) -> Vector {
+    fn div(self, rhs: f32) -> Vector {
         self * (1.0/rhs)
     }
 }

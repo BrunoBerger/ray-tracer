@@ -126,8 +126,8 @@ pub fn path_trace_demo_scene() -> Scene {
     hittable_objects.push( Hittables::Plane(back_wall) );
     hittable_objects.push( Hittables::Plane(left_wall) );
     hittable_objects.push( Hittables::Plane(right_wall) );
-    // hittable_objects.push( Hittables::Sphere(metal_sphere) );
-    // hittable_objects.push( Hittables::Sphere(diff_spehre) );
+    hittable_objects.push( Hittables::Sphere(metal_sphere) );
+    hittable_objects.push( Hittables::Sphere(diff_spehre) );
 
     let light = light::Light::new(Vector::new(3.0, 3.0, 2.0), 1.0, materials::Color::new(0,0,255));
     Scene{hittable_objects, light}

@@ -11,9 +11,9 @@ use crate::objects::*;
 use crate::hit::Hittable;
 use vector::Vector;
 
-const SAMPLES: i32 = 4;
+const SAMPLES: i32 = 1;
 const MAX_BOUNCES: i32 = 4;
-const EPSILON: f64 = 0.0001;
+const EPSILON: f32 = 0.0001;
 const DEFAULT_RES: u32 = 500;
 
 
@@ -34,7 +34,7 @@ fn main() {
     println!("Creating {image_width}x{image_height} image.png");
 
     // Camera setup
-    let fov = 90_f64.to_radians();
+    let fov = 90_f32.to_radians();
     let up = Vector::new(0.0, 1.0, 0.0);
     let eye = Vector::new(0.0, 0.0, -1.0);
     let target = Vector::new(0.0, 0.0, 1.0);
@@ -42,23 +42,23 @@ fn main() {
     let right = vector::cross(&up, &t).normalise();
 
     // Vectors to next pixel
-    let ratio = (image_width as f64) /(image_height as f64);
+    let ratio = (image_width as f32) /(image_height as f32);
     let grid_width = 2.0*((fov/2.0).tan());
     let grid_height = grid_width / ratio;
-    let dx = right * (grid_width / (image_width-1) as f64);
-    let dy = -up * (grid_height / (image_height-1) as f64);
+    let dx = right * (grid_width / (image_width-1) as f32);
+    let dy = -up * (grid_height / (image_height-1) as f32);
     let top_left = t - right*(grid_width/2.0) + up*(grid_height/2.0);
 
     // let scene = scene::get_sample_scene(up);
-    // let scene = scene::random_sphere_scene();
-    let scene = scene::path_trace_demo_scene();
+     let scene = scene::random_sphere_scene();
+    // let scene = scene::path_trace_demo_scene();
 
     // Shoot ray for each pixel
     let mut buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
     for (x, y, img_pixel) in buffer.enumerate_pixels_mut(){
         let mut color = Vector::new(0.0, 0.0, 0.0);
         for _ in 0 .. SAMPLES {
-            let pixel_vec = top_left + (dx*(x) as f64) + (dy*(y) as f64);
+            let pixel_vec = top_left + (dx*(x) as f32) + (dy*(y) as f32);
             let pixel_ray = ray::Ray::new(eye, pixel_vec);
             color += raytrace(&scene, pixel_ray, 0);
 
@@ -86,7 +86,7 @@ fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
         let t = 0.5*(ray.direction.y + 1.0);
         let mut color = Vector::new(1.0, 1.0, 1.0)*(1.0-t) + Vector::new(0.2, 0.5, 1.0)*t;
 
-        let mut max_distance = f64::MAX;
+        let mut max_distance = f32::MAX;
         for object in &scene.hittable_objects {
             match object.intersect(ray) {
                 None => {},
@@ -134,7 +134,7 @@ fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
                                 // Speculardk
                                 let sc = mat.specular_color.to_vector() / 255.0;
                                 let sk = mat.specular_intensity;
-                                let specular_falloff = 2_f64;
+                                let specular_falloff = 2_f32;
                                 let s_part = sc * sk * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff);
                                 color = a_part + d_part + s_part;
 

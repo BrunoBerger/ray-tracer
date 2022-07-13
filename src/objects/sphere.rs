@@ -9,12 +9,12 @@ use crate::materials;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Sphere {
     pub center: Vector,
-    radius: f64,
+    radius: f32,
     pub material: materials::BaseMat,
 }
 
 impl Sphere {
-    pub fn new(center: Vector, radius: f64, material: materials::BaseMat) -> Sphere {
+    pub fn new(center: Vector, radius: f32, material: materials::BaseMat) -> Sphere {
         Sphere{center, radius, material}
     }
 
