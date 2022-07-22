@@ -7,6 +7,7 @@ mod ray;
 mod vector;
 mod util;
 
+use crate::colors;
 use crate::objects::*;
 use crate::hit::Hittable;
 use vector::Vector;
@@ -49,10 +50,17 @@ fn main() {
     let dy = -up * (grid_height / (image_height-1) as f32);
     let top_left = t - right*(grid_width/2.0) + up*(grid_height/2.0);
 
-    // let scene = scene::get_sample_scene(up);
-     let scene = scene::random_sphere_scene();
-    // let scene = scene::path_trace_demo_scene();
+    let scene_def =
+        scene::get_bounding_sample_scene();
+        // scene::get_object_sample_scene(up);
+        // scene::random_sphere_scene();
+        // scene::path_trace_demo_scene();
+    let scene_tree = tree::generate_tree(scene_def);
+    
+    let scene_def2 = scene::get_bounding_sample_scene();
 
+    println!("\nSetup done in: {:.2?}", timer_start.elapsed());
+    let timer_raytrace = std::time::Instant::now();
     // Shoot ray for each pixel
     let mut buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
     for (x, y, img_pixel) in buffer.enumerate_pixels_mut(){
@@ -60,10 +68,10 @@ fn main() {
         for _ in 0 .. SAMPLES {
             let pixel_vec = top_left + (dx*(x) as f32) + (dy*(y) as f32);
             let pixel_ray = ray::Ray::new(eye, pixel_vec);
-            color += raytrace(&scene, pixel_ray, 0);
+            color += raytrace(&scene_def2, pixel_ray, 0);
 
         }
-        *img_pixel = materials::Color::from_vector(color / SAMPLES * 255.0).to_img_rgb();
+        *img_pixel = (color / SAMPLES * 255.0).to_img_rgb();
 
         // Progress report every 10%
         // if y % (image_height / 10) == 0 {
@@ -71,15 +79,16 @@ fn main() {
         //     std::io::Write::flush(&mut std::io::stdout()).unwrap();
         // }
     }
+    println!("Raytracing done in: {:.2?}", timer_raytrace.elapsed());
     
     buffer.save("image.png").unwrap();
-    println!("\nDone in: {:.2?}", timer_start.elapsed());
+    println!("Complete time: {:.2?}", timer_start.elapsed());
 }
 
 
 fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
     if depth > MAX_BOUNCES {
-        Vector::new(0.0, 0.0, 0.0)
+        colors::BLACK
     }
     else {
         // painting in some fake sky background
@@ -95,7 +104,7 @@ fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
                         max_distance = hit.t;
                         let offset_hit_point = hit.point + hit.normal*crate::EPSILON;
 
-                        // Color based on normals
+                        // Vector based on normals
                         // let n = hit.normal;
                         // color = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
 
@@ -124,15 +133,15 @@ fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
                             materials::BaseMat::Lambertian(mat) => {
                                 // Phong Shading
                                 // Ambient
-                                let ac = mat.ambient_color.to_vector() / 255.0;
+                                let ac = mat.ambient_color;
                                 let ak = mat.ambient_intensity;
                                 let a_part = ac * ak;
                                 // Diffuseak
-                                let dc = mat.diffuse_color.to_vector() / 255.0;
+                                let dc = mat.diffuse_color;
                                 let dk = mat.diffuse_intensity;
                                 let d_part = dc * dk * (vector::dot(&hit.normal, &light_dir));
                                 // Speculardk
-                                let sc = mat.specular_color.to_vector() / 255.0;
+                                let sc = mat.specular_color;
                                 let sk = mat.specular_intensity;
                                 let specular_falloff = 2_f32;
                                 let s_part = sc * sk * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff);

@@ -10,6 +10,14 @@ impl Vector {
     pub fn new(x: f32, y: f32, z:f32) -> Vector {
         Vector{x, y, z}
     }
+    pub fn new_from_u8(x: u8, y: u8, z:u8) -> Vector {
+        Vector{x: x as f32 / 255.0, 
+            y: y as f32 / 255.0,
+            z: z as f32 / 255.0}
+    }
+    pub fn new_from_one_float(f: f32) -> Vector {
+        Vector{x: f, y: f, z: f}
+    }
     pub fn distance(&self, other: &Vector)-> f32 {
         let x = other.x - self.x;
         let y = other.y - self.y;
@@ -29,6 +37,9 @@ impl Vector {
             y: self.y * other.y,
             z: self.z * other.z,
         }
+    }
+    pub fn to_img_rgb(&self) -> image::Rgb<u8> {
+        image::Rgb([self.x as u8, self.y as u8, self.z as u8])
     }
 }
 

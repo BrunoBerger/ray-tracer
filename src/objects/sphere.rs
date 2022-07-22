@@ -3,7 +3,7 @@ use crate::hit;
 use crate::ray;
 use crate::vector;
 use crate::vector::Vector;
-use crate::materials;
+use crate::objects::*;
 
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -58,6 +58,12 @@ impl hit::Hittable for Sphere {
         else {
             None
         } 
+    }
+    fn bounding_box(&self) -> bounding::Aabb {
+        let rad_vec = Vector::new_from_one_float(self.radius);
+        bounding::Aabb::new(
+            self.center - rad_vec, 
+            self.center + rad_vec)
     }
 }
 

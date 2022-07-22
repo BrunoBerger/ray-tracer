@@ -3,17 +3,17 @@ use crate::hit;
 use crate::ray;
 // use crate::vector;
 use crate::vector::Vector;
-use crate::materials;
+// use crate::materials;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Aabb {
-    min: Vector,
-    max: Vector,
-    pub material: materials::BaseMat,
+    pub min: Vector,
+    pub max: Vector,
+    // pub material: materials::BaseMat,
 }
 
 impl Aabb {
-    pub fn new(min: Vector, max: Vector, material: materials::BaseMat) -> Aabb {
+    pub fn new(min: Vector, max: Vector) -> Aabb {
         Aabb{
             min: Vector::new(
                 f32::min(min.x, max.x),
@@ -25,10 +25,44 @@ impl Aabb {
                 f32::max(min.y, max.y),
                 f32::max(min.z, max.z)
             ), 
-            material
+            // material
         }
     }
 }
+pub fn add_boxes(a: Aabb, b: Aabb) -> Aabb {
+    let new_min = Vector::new(
+        f32::min(a.min.x, b.min.x),
+        f32::min(a.min.y, b.min.y),
+        f32::min(a.min.z, b.min.z)
+    );
+    let new_max = Vector::new(
+        f32::max(a.max.x, b.max.x),
+        f32::max(a.max.y, b.max.y),
+        f32::max(a.max.z, b.max.z)
+    );
+    Aabb::new(new_min, new_max)
+}
+
+// impl hit::Hittable for Aabb {
+//     fn intersect(&self, ray: ray::Ray) -> Option<hit::Hit> {
+//         // return None;
+
+//         // Using: https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/anoptimizedaabbhitmethod
+//         let mut tmin = 5.0;
+//         let mut tmax = 5.0;
+//         let mut invDirAxis = 1.0 / ray.direction.x;
+//         let mut t0 = (&self.min.x - ray.origin.x) * invDirAxis;
+//         let mut t1 = (&self.max.x - ray.origin.x) * invDirAxis;
+//         if invDirAxis < 0.0 {std::mem::swap(&mut t0, &mut t1)}
+//         tmin = if t0 < tmin {t0} else {tmin};
+//         tmax = if t1 < tmax {t1} else {tmax};
+//         if tmax <= tmin {
+//             return None
+//         }
+
+//         Some(hit::Hit::new(t0, ray.at(tmin), ray.direction))
+//     }
+// }
 
 impl hit::Hittable for Aabb {
     // using: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
@@ -80,7 +114,10 @@ impl hit::Hittable for Aabb {
             tmax = tzmax;
         }
 
-        Some(hit::Hit::new(tmin, ray.at(tmin), Vector::new(1.0, 1.0, 1.0)))
+        Some(hit::Hit::new(tmin, ray.at(tmax), Vector::new(1.0, 1.0, 1.0)))
         //TODO create swap fn
+    }
+    fn bounding_box(&self) -> Aabb {
+        *self
     }
 }

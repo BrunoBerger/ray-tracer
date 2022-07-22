@@ -4,11 +4,12 @@ use crate::ray;
 use crate::vector;
 use crate::vector::Vector;
 use crate::materials;
+use crate::bounding;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Plane {
     pub normal: Vector,
-    offset: f32,
+    pub offset: f32,
     pub material: materials::BaseMat,
 }
 
@@ -28,5 +29,9 @@ impl hit::Hittable for Plane {
         else {
             Some(hit::Hit::new(t, ray.at(t), self.normal))
         }
+    }
+    fn bounding_box(&self) -> bounding::Aabb {
+        let inf_vec = Vector::new_from_one_float(f32::MAX);
+        bounding::Aabb::new(-inf_vec, inf_vec)
     }
 }

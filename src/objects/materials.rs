@@ -8,13 +8,13 @@ pub enum BaseMat {
     
 }
 impl BaseMat {
-    pub fn new_metal(albedo: Color) -> BaseMat {
+    pub fn new_metal(albedo: Vector) -> BaseMat {
         BaseMat::Metal( Metal{albedo} )
     }
     pub fn new_lambertian(
-        ambient_color: Color, ambient_intensity: f32,
-        diffuse_color: Color, diffuse_intensity: f32,
-        specular_color: Color, specular_intensity: f32
+        ambient_color: Vector, ambient_intensity: f32,
+        diffuse_color: Vector, diffuse_intensity: f32,
+        specular_color: Vector, specular_intensity: f32
     ) -> BaseMat {
         BaseMat::Lambertian( Lambertian{
             ambient_color, ambient_intensity,
@@ -26,22 +26,22 @@ impl BaseMat {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Metal {
-    pub albedo: Color,
+    pub albedo: Vector,
 }
 
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Lambertian {
-    pub ambient_color: Color,
+    pub ambient_color: Vector,
     pub ambient_intensity: f32,
-    pub diffuse_color: Color,
+    pub diffuse_color: Vector,
     pub diffuse_intensity: f32,
-    pub specular_color: Color,
+    pub specular_color: Vector,
     pub specular_intensity: f32,
 
 }
 
-pub fn diffuse_from_color(in_color: Color) -> BaseMat {
+pub fn diffuse_from_color(in_color: Vector) -> BaseMat {
     BaseMat::Lambertian( Lambertian {
             ambient_color: in_color,
             ambient_intensity: 0.2,
@@ -56,25 +56,25 @@ pub fn diffuse_from_color(in_color: Color) -> BaseMat {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Color {
-    pub x: u8,
-    pub y: u8,
-    pub z: u8
+    pub r: u8,
+    pub g: u8,
+    pub b: u8
 }
 impl Color {
-    pub fn new(x: u8, y: u8, z: u8) -> Color {
-        Color{x,y,z}
+    pub fn new(r: u8, g: u8, b: u8) -> Color {
+        Color{r,g,b}
     }
     pub fn from_vector(vec: Vector) -> Color {
         Color{
-            x: vec.x as u8,
-            y: vec.y as u8,
-            z: vec.z as u8
+            r: vec.x as u8,
+            g: vec.y as u8,
+            b: vec.z as u8
         }
     }
     pub fn to_vector(&self) -> Vector {
-        Vector::new(self.x as f32, self.y as f32, self.z as f32)
+        Vector::new(self.r as f32, self.g as f32, self.b as f32)
     }
     pub fn to_img_rgb(&self) -> image::Rgb<u8> {
-        image::Rgb([self.x, self.y, self.z])
+        image::Rgb([self.r, self.g, self.b])
     }
 }

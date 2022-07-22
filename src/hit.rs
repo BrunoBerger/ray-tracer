@@ -5,6 +5,8 @@ use crate::objects::*;
 
 pub trait Hittable {
     fn intersect(&self, ray: ray::Ray) -> Option<Hit>;
+    fn bounding_box(&self) -> bounding::Aabb;
+    // fn get_center(&self) -> Vector;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -12,6 +14,7 @@ pub enum Hittables {
     Sphere(sphere::Sphere),
     Plane(plane::Plane),
     Triangle(triangle::Triangle),
+    Aabb(bounding::Aabb)
 }
 // Possiblities if this does not work out:
 // https://stackoverflow.com/questions/26378842/how-do-i-overcome-match-arms-with-incompatible-types-for-structs-implementing-sa
@@ -21,7 +24,19 @@ impl Hittables {
             Hittables::Sphere(obj) => obj.material,
             Hittables::Plane(obj) => obj.material,
             Hittables::Triangle(obj) => obj.material,
+            Hittables::Aabb(_) => materials::BaseMat::new_metal(colors::BLACK)
         }
+    }
+    pub fn get_center(&self) -> Vector {
+        match self {
+            Hittables::Sphere(obj) => obj.center,
+            Hittables::Plane(obj) => obj.normal * obj.offset,
+            Hittables::Triangle(obj) => (obj.p0 + obj.p1 + obj.p2) / 3,
+            Hittables::Aabb(obj) => obj.max - obj.min
+        }
+    }
+    pub fn get_bounds(&self) -> bounding::Aabb {
+        self.bounding_box()
     }
 }
 impl Hittable for Hittables {
@@ -30,6 +45,15 @@ impl Hittable for Hittables {
             Hittables::Sphere(obj) => obj.intersect(ray),
             Hittables::Plane(obj) => obj.intersect(ray),
             Hittables::Triangle(obj) => obj.intersect(ray),
+            Hittables::Aabb(obj) => obj.intersect(ray)
+        }
+    }
+    fn bounding_box(&self) -> bounding::Aabb {
+        match self {
+            Hittables::Sphere(obj) => obj.bounding_box(),
+            Hittables::Plane(obj) => obj.bounding_box(),
+            Hittables::Triangle(obj) => obj.bounding_box(),
+            Hittables::Aabb(obj) => obj.bounding_box()
         }
     }
 }
