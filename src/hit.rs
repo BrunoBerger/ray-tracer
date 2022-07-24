@@ -59,15 +59,15 @@ impl Hittable for Hittables {
 }
 
 
-#[derive(Debug, Clone, Copy)]
 pub struct Hit {
     pub t: f32,
     pub point: Vector,
     pub normal: Vector,
+    pub object: Box<dyn Hittable>
 }
 impl Hit {
-    pub fn new (t: f32, point: Vector, normal: Vector) -> Hit {
-        Hit{t, point, normal: normal.normalise()}
+    pub fn new (t: f32, point: Vector, normal: Vector, object: Box<dyn Hittable>) -> Hit {
+        Hit{t, point, normal: normal.normalise(), object}
     }
 }
 impl std::fmt::Display for Hit {

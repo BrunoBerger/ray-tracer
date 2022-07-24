@@ -53,7 +53,7 @@ impl hit::Hittable for Sphere {
             }          
             let point = ray.at(t);
             let normal = self.normal(point);
-            Some(hit::Hit::new(t, point, normal))
+            Some(hit::Hit::new(t, point, normal, Box::new(*self)))
         }
         else {
             None

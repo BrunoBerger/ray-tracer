@@ -5,7 +5,7 @@ use crate::ray::Ray;
 
 // type ChildNode = Option<Box<BTNode>>;
 
-struct Node {
+pub struct Node {
     bbox: bounding::Aabb,
     left: Option<Box<Node>>,
     right: Option<Box<Node>>,
@@ -47,8 +47,8 @@ impl Node {
 }
 
 pub struct SceneTree {
-    root: Node,
-    light: light::Light
+    pub root: Node,
+    pub light: light::Light
 }
 
 pub fn generate_tree(mut scene: scene::Scene) -> SceneTree {
@@ -82,21 +82,25 @@ pub fn generate_tree(mut scene: scene::Scene) -> SceneTree {
         .unwrap_or(std::cmp::Ordering::Equal)
     );
     
-    // let min = std::cmp::min_by_key(scene.hittable_objects, v2: T, mut f: F);
-    // scene.hittable_objects.iter().map(|i| (X(*i),)).min_by(|a, b| a.0.cmp(&b.0));
-    // scene.hittable_objects
-    //     .iter()
-    //     .map(|i| i.get_bounds())
-    //     .min_by(|a, b| a.min.z.cmp(&b.max.z));
-
     
-    
+    let mut root_node = Node{bbox: root_box, left: None, right: None, object: None};
 
-    for i in &scene.hittable_objects {
+    // let parent_node_ptr: *mut Node = &mut root_node;
+    let mut idx = 0;
+    // while &scene.hittable_objects.len() > &0 {
+    //     root_node.left = Some(Box::new(
+    //         Node::add_split(
+    //             scene.hittable_objects[idx].bounding_box(),
+    //              l: Node, 
+    //              r: Node
+    //         )
+    //     ))
+    // }
+    // for obj in &scene.hittable_objects {
 
-    }
+    // }
 
-    let test_node = Node::add_leaf(scene.hittable_objects[0].bounding_box(), Box::new(scene.hittable_objects[0]));
-    SceneTree{root: test_node, light: scene.light}
+    // let test_node = Node::add_leaf(scene.hittable_objects[0].bounding_box(), Box::new(scene.hittable_objects[5]));
+    SceneTree{root: root_node, light: scene.light}
     // scene::Scene{hittable_objects: scene.hittable_objects, light: scene.light}
 }

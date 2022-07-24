@@ -114,7 +114,7 @@ impl hit::Hittable for Aabb {
             tmax = tzmax;
         }
 
-        Some(hit::Hit::new(tmin, ray.at(tmax), Vector::new(1.0, 1.0, 1.0)))
+        Some(hit::Hit::new(tmin, ray.at(tmax), Vector::new(1.0, 1.0, 1.0), Box::new(*self)))
         //TODO create swap fn
     }
     fn bounding_box(&self) -> Aabb {

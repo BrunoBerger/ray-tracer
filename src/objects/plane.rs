@@ -27,7 +27,7 @@ impl hit::Hittable for Plane {
             None
         }
         else {
-            Some(hit::Hit::new(t, ray.at(t), self.normal))
+            Some(hit::Hit::new(t, ray.at(t), self.normal, Box::new(*self)))
         }
     }
     fn bounding_box(&self) -> bounding::Aabb {

@@ -76,7 +76,7 @@ impl hit::Hittable for Triangle {
         // u /= denom;
         // v /= denom;
 
-        Some(hit::Hit::new(t, hit_point, n))
+        Some(hit::Hit::new(t, hit_point, n, Box::new(*self)))
     }
     fn bounding_box(&self) -> bounding::Aabb {
         unimplemented!();
