@@ -9,9 +9,9 @@ use crate::vector::Vector;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Triangle {
     // points always counterclockwise
-    p0: Vector,
-    p1: Vector,
-    p2: Vector,
+    pub p0: Vector,
+    pub p1: Vector,
+    pub p2: Vector,
     plane: plane::Plane,
     pub material: materials::BaseMat,
 }
@@ -77,5 +77,8 @@ impl hit::Hittable for Triangle {
         // v /= denom;
 
         Some(hit::Hit::new(t, hit_point, n))
+    }
+    fn bounding_box(&self) -> bounding::Aabb {
+        unimplemented!();
     }
 }
