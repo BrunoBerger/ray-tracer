@@ -74,7 +74,7 @@ impl Color {
     pub fn to_vector(&self) -> Vector {
         Vector::new(self.r as f32, self.g as f32, self.b as f32)
     }
-    pub fn to_img_rgb(&self) -> image::Rgb<u8> {
-        image::Rgb([self.r, self.g, self.b])
-    }
+    // pub fn to_img_rgb(&self) -> image::Rgb<u8> {
+    //     image::Rgb([self.r, self.g, self.b])
+    // }
 }
