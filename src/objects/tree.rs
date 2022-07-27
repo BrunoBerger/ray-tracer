@@ -74,7 +74,7 @@ pub fn generate_tree(mut scene: scene::Scene) -> SceneTree {
     root_min.z = scene.hittable_objects[0].get_bounds().min.z;
     root_max.z = scene.hittable_objects[n].get_bounds().max.z;
     let root_box = bounding::Aabb::new(root_min, root_max);
-    println!("Root Box: {root_box:#?}");
+    // println!("Root Box: {root_box:#?}");
 
     
     scene.hittable_objects.sort_by(|a, b|

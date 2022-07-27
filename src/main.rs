@@ -1,5 +1,9 @@
 #![allow(dead_code)]
 // #![allow(unused_variables)]
+// use std::fs::File;
+// use std::io::BufWriter;
+use std::io::prelude::*;
+use rayon::prelude::*;
 
 mod hit;
 mod objects;
@@ -12,7 +16,7 @@ use crate::objects::*;
 use crate::hit::Hittable;
 use vector::Vector;
 
-const SAMPLES: i32 = 1;
+const SAMPLES: i32 = 4;
 const MAX_BOUNCES: i32 = 4;
 const EPSILON: f32 = 0.0001;
 const DEFAULT_RES: u32 = 500;
@@ -50,38 +54,69 @@ fn main() {
     let dy = -up * (grid_height / (image_height-1) as f32);
     let top_left = t - right*(grid_width/2.0) + up*(grid_height/2.0);
 
-    let scene_def =
-        scene::get_bounding_sample_scene();
-        // scene::get_object_sample_scene(up);
-        // scene::random_sphere_scene();
-        // scene::path_trace_demo_scene();
-    let scene_tree = tree::generate_tree(scene_def);
-    
-    let scene_def2 = scene::get_bounding_sample_scene();
+    // let scene_def_for_tree = scene::get_bounding_sample_scene();
+    // let scene_tree = tree::generate_tree(scene_def_for_tree);
 
-    println!("\nSetup done in: {:.2?}", timer_start.elapsed());
+    let scene_def =
+        // scene::get_bounding_sample_scene();
+        // scene::get_object_sample_scene(up);
+        scene::random_sphere_scene();
+        // scene::path_trace_demo_scene();
+
+    println!("Setup done in: {:.2?}", timer_start.elapsed());
     let timer_raytrace = std::time::Instant::now();
     // Shoot ray for each pixel
-    let mut buffer: image::RgbImage = image::ImageBuffer::new(image_width, image_height);
-    for (x, y, img_pixel) in buffer.enumerate_pixels_mut(){
-        let mut color = Vector::new(0.0, 0.0, 0.0);
-        for _ in 0 .. SAMPLES {
-            let pixel_vec = top_left + (dx*(x) as f32) + (dy*(y) as f32);
-            let pixel_ray = ray::Ray::new(eye, pixel_vec);
-            color += raytrace(&scene_def2, pixel_ray, 0);
-
-        }
-        *img_pixel = (color / SAMPLES * 255.0).to_img_rgb();
-
-        // Progress report every 10%
-        // if y % (image_height / 10) == 0 {
-        //     print!("\r{} rows remaining ", image_height-y);
-        //     std::io::Write::flush(&mut std::io::stdout()).unwrap();
-        // }
-    }
-    println!("Raytracing done in: {:.2?}", timer_raytrace.elapsed());
     
-    buffer.save("image.png").unwrap();
+    // let file = File::create("image.png").unwrap();
+    // let mut encoder = png::Encoder::new(BufWriter::new(file), image_width, image_height);
+    // encoder.set_color(png::ColorType::Rgb);
+    // encoder.set_depth(png::BitDepth::Eight);
+    // let mut writer = encoder.write_header().unwrap().into_stream_writer().unwrap();
+    // for y in (0..image_height as usize).par_iter_mut() {
+    //     // eprint!("{}/{}\n", image_height - 1 - y, image_height);
+    //     for x in 0..image_width {
+    //         let mut color = Vector::new(0.0, 0.0, 0.0);
+    //         for _ in 0 .. SAMPLES {
+    //             let pixel_vec = top_left + (dx*(x) as f32) + (dy*(y) as f32);
+    //             let pixel_ray = ray::Ray::new(eye, pixel_vec);
+    //             color += raytrace(&scene_def, pixel_ray, 0);
+    //         }
+    //         writer.write(&(color / SAMPLES).encode()).unwrap();
+    //     }
+    // }
+    
+    // New file writing from https://medium.com/@cfsamson/from-48s-to-5s-optimizing-a-350-line-pathtracer-in-rust-191ab4a1a412
+    let filename = String::from("output-rust.ppm");
+    println!(
+        "Width: = {}, Height: = {}, Samples = {}",
+        image_width, image_height, SAMPLES
+    );
+    println!("Writing data to {}", filename);
+    let mut file = std::fs::File::create(filename).unwrap();
+    write!(file, "P6 {} {} 255 ", image_width, image_height).unwrap();
+    const BYTES_PER_PIXEL: usize = 3;
+    let mut bytes = vec![0u8; image_height as usize * image_width as usize * BYTES_PER_PIXEL];
+    bytes.par_chunks_mut(BYTES_PER_PIXEL)
+        .into_par_iter()
+        .enumerate()
+        .for_each(|(idx, chunk)| {
+            let y = (idx / image_width as usize) as f32;
+            let x = (idx % image_height as usize) as f32;
+            let mut color = colors::BLACK;
+            for _ in 0..SAMPLES {
+                let pixel_vec = top_left + (dx*(x) as f32) + (dy*(y) as f32);
+                let pixel_ray = ray::Ray::new(eye, pixel_vec);
+                color += raytrace(&scene_def, pixel_ray, 0);
+            }
+            color = color * 255.0;
+            chunk[0] = color.x as u8;
+            chunk[1] = color.y as u8;
+            chunk[2] = color.z as u8;
+        });
+
+    file.write_all(&bytes).unwrap();
+
+    println!("Raytracing done in: {:.2?}", timer_raytrace.elapsed());
     println!("Complete time: {:.2?}", timer_start.elapsed());
 }
 

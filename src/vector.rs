@@ -38,8 +38,15 @@ impl Vector {
             z: self.z * other.z,
         }
     }
-    pub fn to_img_rgb(&self) -> image::Rgb<u8> {
-        image::Rgb([self.x as u8, self.y as u8, self.z as u8])
+    // pub fn to_img_rgb(&self) -> image::Rgb<u8> {
+    //     image::Rgb([self.x as u8, self.y as u8, self.z as u8])
+    // }
+    pub fn encode(self) -> [u8; 3] {
+        [
+            (self.x * 255.0) as u8,
+            (self.y * 255.0) as u8,
+            (self.z * 255.0) as u8
+        ]
     }
 }
 
