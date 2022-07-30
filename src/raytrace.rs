@@ -25,7 +25,7 @@ pub fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
                         max_distance = hit.t;
                         let offset_hit_point = hit.point + hit.normal*crate::EPSILON;
 
-                        // Vector based on normals
+                        // Debug Option: Coloring based on normals
                         // let n = hit.normal;
                         // color = (Vector::new(n.x+1.0, n.y+1.0, n.z+1.0))*0.5;
 
@@ -33,7 +33,7 @@ pub fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
                         let refl_direction = ray.direction - hit.normal * vector::dot(&ray.direction, &hit.normal) * 2.0;
 
                         // Shadow
-                        let mut shadow_color = Vector::new(1.0, 1.0, 1.0);
+                        let mut shadow_color = colors::WHITE;
                         let distance_to_light = hit.point.distance(&scene.light.position);
                         for shadow_object in &scene.hittable_objects {
                             if shadow_object != object {
@@ -57,30 +57,28 @@ pub fn raytrace(scene: &scene::Scene, ray: ray::Ray, depth: i32) -> Vector {
                                 let ac = mat.ambient_color;
                                 let ak = mat.ambient_intensity;
                                 let a_part = ac * ak;
-                                // Diffuseak
+                                // Diffuse
                                 let dc = mat.diffuse_color;
                                 let dk = mat.diffuse_intensity;
                                 let d_part = dc * dk * (vector::dot(&hit.normal, &light_dir));
-                                // Speculardk
+                                // Specular
                                 let sc = mat.specular_color;
                                 let sk = mat.specular_intensity;
                                 let specular_falloff = 2_f32;
                                 let s_part = sc * sk * vector::dot(&refl_direction, &-ray.direction).powf(specular_falloff);
                                 color = a_part + d_part + s_part;
 
-
                                 // Scattering
-                                let mut indirect_color = Vector::new(0.0, 0.0, 0.0);
-                                for _ in 0..crate::SAMPLES {
-                                    let scatter_ray = ray::Ray::new(
-                                        offset_hit_point,
-                                        hit.normal + util::rndm_on_sphere()
-                                    );
-                                    indirect_color += raytrace(&scene, scatter_ray, depth+2)
-                                }
-                                indirect_color = indirect_color / crate::SAMPLES;
-
-                                color.scale(indirect_color*0.2);
+                                // let mut indirect_color = colors::BLACK;
+                                // for _ in 0..crate::SAMPLES {
+                                //     let scatter_ray = ray::Ray::new(
+                                //         offset_hit_point,
+                                //         hit.normal + util::rndm_on_sphere()
+                                //     );
+                                //     indirect_color += raytrace(&scene, scatter_ray, depth +1)
+                                // }
+                                // indirect_color = indirect_color / crate::SAMPLES;
+                                // color = color.scale(indirect_color);
                             }
                             materials::BaseMat::Metal(_mat) => {
                                 let refl_ray = ray::Ray::new(offset_hit_point, refl_direction);

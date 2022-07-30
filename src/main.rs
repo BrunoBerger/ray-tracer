@@ -17,7 +17,7 @@ use crate::objects::*;
 use vector::Vector;
 
 const SAMPLES: i32 = 1;
-const MAX_BOUNCES: i32 = 4;
+const MAX_BOUNCES: i32 = 2;
 const EPSILON: f32 = 0.0001;
 const DEFAULT_RES: u32 = 500;
 const BYTES_PER_PIXEL: usize = 3;
@@ -78,6 +78,7 @@ fn main() {
         .into_par_iter()
         .enumerate()
         .for_each(|(idx, chunk)| {
+            // TODO fix for non-square aspect ratio
             let y = (idx / image_width as usize) as f32;
             let x = (idx % image_height as usize) as f32;
             let mut color = colors::BLACK;
