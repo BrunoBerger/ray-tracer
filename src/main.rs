@@ -60,7 +60,8 @@ fn main() {
     let scene_def =
         // scene::get_bounding_sample_scene();
         // scene::get_object_sample_scene(up);
-        scene::random_sphere_scene();
+        // scene::random_sphere_scene();
+        scene::consistent_sphere_scene();
         // scene::path_trace_demo_scene();
 
     // setting up png-file and vector for pixel data
@@ -81,6 +82,7 @@ fn main() {
             // TODO fix for non-square aspect ratio
             let y = (idx / image_width as usize) as f32;
             let x = (idx % image_height as usize) as f32;
+            // println!("{:#?} x:{x} y:{y}", rayon::current_thread_index().unwrap());
             let mut color = colors::BLACK;
             for _ in 0..SAMPLES {
                 let pixel_vec = top_left + (dx*(x) as f32) + (dy*(y) as f32);

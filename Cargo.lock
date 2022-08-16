@@ -241,6 +241,7 @@ version = "0.1.0"
 dependencies = [
  "png",
  "rand",
+ "rand_chacha",
  "rand_distr",
  "rayon",
 ]

@@ -1,5 +1,6 @@
 
-use rand::Rng;
+use rand::SeedableRng;
+use rand_chacha::ChaCha8Rng;
 
 use crate::objects::*;
 use crate::hit::Hittables;
@@ -89,8 +90,17 @@ pub fn get_object_sample_scene(up: Vector) -> Scene {
 }
 
 pub fn random_sphere_scene() -> Scene {
+    base_sphere_scene(rand::thread_rng())
+}
+pub fn consistent_sphere_scene() -> Scene {
+    base_sphere_scene(ChaCha8Rng::seed_from_u64(2))
+}
+fn base_sphere_scene<T>(mut rng: T) -> Scene
+where T: rand::Rng,  
+{
     let mut hittable_objects = Vec::new();
-    let mut rng = rand::thread_rng();
+    // let mut rng = rand::thread_rng();
+    // let mut rng = ChaCha8Rng::seed_from_u64(2);
 
     let grey = Vector::new_from_u8(180, 180, 180);
 

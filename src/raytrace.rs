@@ -3,7 +3,7 @@ use crate::colors;
 use crate::hit::Hittable;
 use crate::objects::*;
 use crate::ray;
-use crate::util;
+// use crate::util;
 use crate::vector;
 use crate::vector::Vector;
 
