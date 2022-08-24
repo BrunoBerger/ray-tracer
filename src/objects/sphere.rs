@@ -33,31 +33,28 @@ impl hit::Hittable for Sphere {
         let c = vector::dot(&orign_to_center, &orign_to_center) - self.radius*self.radius;
 
         let discriminant = b*b - 4.0*a*c;
-        if discriminant > 0.0 {
-            let t0 = (-b - discriminant.sqrt()) / 2.0;
-            let t1 = (-b + discriminant.sqrt()) / 2.0;
-            
-            // TODO: redo this better
-            let t;
-            if (t0 < 0.0) & (t1 > 0.0) {
-                t = t1;
-            }
-            else if (t1 > 0.0) & (t1 < 0.0) {
-                t = t0;
-            }
-            else if  (t1 > 0.0) & (t1 > 0.0) {
-                t = t0.min(t1);
-            }
-            else {
-                return None
-            }          
-            let point = ray.at(t);
-            let normal = self.normal(point);
-            Some(hit::Hit::new(t, point, normal))
+        if discriminant < 0.0 {
+            return None
+        }
+        let t0 = (-b - discriminant.sqrt()) / 2.0;
+        let t1 = (-b + discriminant.sqrt()) / 2.0;
+        // TODO: redo this better
+        let t;
+        if (t0 < 0.0) & (t1 > 0.0) {
+            t = t1;
+        }
+        else if (t1 > 0.0) & (t0 < 0.0) {
+            t = t0;
+        }
+        else if t0 > 0.0 {
+            t = t0.min(t1);
         }
         else {
-            None
-        } 
+            return None
+        }          
+        let point = ray.at(t);
+        let normal = self.normal(point);
+        Some(hit::Hit::new(t, point, normal))
     }
     fn bounding_box(&self) -> bounding::Aabb {
         let rad_vec = Vector::new_from_one_float(self.radius);
@@ -66,4 +63,3 @@ impl hit::Hittable for Sphere {
             self.center + rad_vec)
     }
 }
-

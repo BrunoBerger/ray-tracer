@@ -96,7 +96,7 @@ pub fn consistent_sphere_scene() -> Scene {
     base_sphere_scene(ChaCha8Rng::seed_from_u64(2))
 }
 fn base_sphere_scene<T>(mut rng: T) -> Scene
-where T: rand::Rng,  
+where T: rand::Rng
 {
     let mut hittable_objects = Vec::new();
     // let mut rng = rand::thread_rng();

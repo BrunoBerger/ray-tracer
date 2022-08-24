@@ -12,6 +12,7 @@ mod ray;
 mod raytrace;
 mod util;
 mod vector;
+mod encoding;
 
 use crate::objects::*;
 use vector::Vector;
@@ -94,8 +95,19 @@ fn main() {
             chunk[1] = color.y as u8;
             chunk[2] = color.z as u8;
         });
-    writer.write_image_data(&pixel_data).unwrap();
-
+    
     println!("Raytracing done in: {:.2?}", timer_raytrace.elapsed());
-    println!("Complete time: {:.2?}", timer_start.elapsed());
+
+    let timer_encode = std::time::Instant::now();
+    writer.write_image_data(&pixel_data).unwrap();
+    
+    encoding::qoi_encode(
+        pixel_data, 
+        encoding::QoiDesc{
+            width: image_width,
+            height: image_height,
+            channels: 3,
+            colorspace: 255 
+        });
+    println!("Encoding done in: {:.2?}", timer_encode.elapsed());
 }
