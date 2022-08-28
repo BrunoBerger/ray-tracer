@@ -26,6 +26,13 @@ struct Pixel {
     pub a: u8
 }
 
+fn qoi_write32(bytes: &mut Vec<u8>, p: &mut usize, value: u32) {
+    bytes[*p] = ((0xff000000 & value) >> 24) as u8;
+    bytes[*p+1] = ((0x00ff0000 & value) >> 16) as u8;
+    bytes[*p+2] = ((0x0000ff00 & value) >> 8) as u8;
+    bytes[*p+3] = (0x000000ff & value) as u8;
+    *p+=4;
+}
 fn qoi_color_hash(p: &Pixel) -> usize {
     (p.r as u32 *3 + p.g as u32 *5 + p.b as u32 *11) as usize
 }
@@ -40,12 +47,18 @@ pub fn qoi_encode(data: Vec<u8>, desc: QoiDesc) {
     ) as i32;
     
     let mut p = 0;
-    let mut bytes: Vec<u8> = Vec::with_capacity(max_size as usize);
+    // let mut bytes: Vec<u8> = Vec::with_capacity(max_size as usize);
+    let mut bytes: Vec<u8> = vec![0; max_size as usize];
     let mut index: Vec<Pixel> = vec![Pixel{r:0,g:0,b:0,a:0}; 64];
 
-    // TODO
-    // header stuff here!
-    // 
+
+    qoi_write32(&mut bytes, &mut p,  QOI_MAGIC);
+    qoi_write32(&mut bytes, &mut p, desc.width);
+    qoi_write32(&mut bytes, &mut p, desc.height);
+    bytes[p] = desc.channels;
+    bytes[p+1] = desc.colorspace;
+    p+=2;
+
 
     let mut run = 0;
     let mut prev_px = Pixel{r:0, g: 0, b: 0, a: 255};
@@ -82,11 +95,15 @@ pub fn qoi_encode(data: Vec<u8>, desc: QoiDesc) {
             } else {
                 index[index_pos] = px;
                 if px.a == prev_px.a {
-                    let vr: i8 = (px.r - prev_px.r) as i8;
-                    let vg: i8 = (px.g - prev_px.g) as i8;
-                    let vb: i8 = (px.b - prev_px.b) as i8;
-                    let vg_r: i8 = vr - vg; // TODO fix overflow sub
-                    let vg_b: i8 = vb - vg;
+                    // TODO? fix overflow sub?
+                    // let vr: i8 = (px.r - prev_px.r) as i8;
+                    // let vg: i8 = (px.g - prev_px.g) as i8;
+                    // let vb: i8 = (px.b - prev_px.b) as i8;
+                    let vr = px.r.wrapping_sub(prev_px.r) as i8;
+                    let vg = px.g.wrapping_sub(prev_px.g) as i8;
+                    let vb = px.b.wrapping_sub(prev_px.b) as i8;
+                    let vg_r: i8 = vr.wrapping_sub(vg); 
+                    let vg_b: i8 = vb.wrapping_sub(vg);
                     
                     if  
                         vr > -3 && vr < 2 && 
@@ -131,6 +148,10 @@ pub fn qoi_encode(data: Vec<u8>, desc: QoiDesc) {
         p+=1;
     }
 
-    println!("max_size: {} bytes: {} tmp:{}", max_size, bytes.capacity(), std::mem::size_of_val(&QOI_MAGIC));
+    
+    let mut file = std::fs::File::create("image.qoi").unwrap();
+    std::io::Write::write_all(&mut file, &bytes).unwrap();
+
+    // println!("{}", std::mem::size_of_val(&desc.width));
 }
 
