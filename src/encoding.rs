@@ -34,7 +34,7 @@ fn qoi_write32(bytes: &mut Vec<u8>, p: &mut usize, value: u32) {
     *p+=4;
 }
 fn qoi_color_hash(p: &Pixel) -> usize {
-    (p.r as u32 *3 + p.g as u32 *5 + p.b as u32 *11) as usize
+    (p.r*3 + p.g*5 + p.b*7 + p.a*11) as usize
 }
 
 pub fn qoi_encode(data: Vec<u8>, desc: QoiDesc) {
@@ -52,6 +52,7 @@ pub fn qoi_encode(data: Vec<u8>, desc: QoiDesc) {
     let mut index: Vec<Pixel> = vec![Pixel{r:0,g:0,b:0,a:0}; 64];
 
 
+    // QOI header
     qoi_write32(&mut bytes, &mut p,  QOI_MAGIC);
     qoi_write32(&mut bytes, &mut p, desc.width);
     qoi_write32(&mut bytes, &mut p, desc.height);
@@ -66,7 +67,6 @@ pub fn qoi_encode(data: Vec<u8>, desc: QoiDesc) {
 
     let px_len: i32 = (desc.width * desc.height * desc.channels as u32) as i32;
     let px_end: i32 = px_len - desc.channels as i32;
-    // let mut px_pos: i32;
 
     for px_pos in (0..px_len).step_by(desc.channels as usize) {
         // println!("{px_pos}");
@@ -78,7 +78,7 @@ pub fn qoi_encode(data: Vec<u8>, desc: QoiDesc) {
         if px == prev_px {
             run+=1;
             if run == 62 || px_pos == px_end {
-                bytes[p] = QOI_OP_RUN | (run -1);
+                bytes[p] = QOI_OP_RUN | (run - 1);
                 p+=1;
                 run = 0;
             }
@@ -90,12 +90,14 @@ pub fn qoi_encode(data: Vec<u8>, desc: QoiDesc) {
             }
 
             let index_pos = qoi_color_hash(&px) % 64;
+            // println!("{}", index_pos);
             if index[index_pos] == px {
                 bytes[p] = QOI_OP_INDEX | index_pos as u8;
+                p+=1;
             } else {
                 index[index_pos] = px;
                 if px.a == prev_px.a {
-                    // TODO? fix overflow sub?
+                    // gives same result as the one below
                     // let vr: i8 = (px.r - prev_px.r) as i8;
                     // let vg: i8 = (px.g - prev_px.g) as i8;
                     // let vb: i8 = (px.b - prev_px.b) as i8;
@@ -150,8 +152,6 @@ pub fn qoi_encode(data: Vec<u8>, desc: QoiDesc) {
 
     
     let mut file = std::fs::File::create("image.qoi").unwrap();
-    std::io::Write::write_all(&mut file, &bytes).unwrap();
-
-    // println!("{}", std::mem::size_of_val(&desc.width));
+    std::io::Write::write_all(&mut file, &bytes[..p]).unwrap();
 }
 

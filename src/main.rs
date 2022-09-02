@@ -107,7 +107,7 @@ fn main() {
             width: image_width,
             height: image_height,
             channels: 3,
-            colorspace: 255 
+            colorspace: 1
         });
     println!("Encoding done in: {:.2?}", timer_encode.elapsed());
 }
