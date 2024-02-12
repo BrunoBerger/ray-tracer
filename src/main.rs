@@ -101,13 +101,31 @@ fn main() {
     let timer_encode = std::time::Instant::now();
     writer.write_image_data(&pixel_data).unwrap();
     
+
+    // QOI STUFF:
+
+    // encoding::qoi_encode(
+    //     pixel_data, 
+    //     encoding::QoiDesc{
+    //         width: image_width,
+    //         height: image_height,
+    //         channels: BYTES_PER_PIXEL as u8,
+    //         colorspace: 1
+    //     });
+    
+    let res: u32 = 2;
+    let test_size = res * res * 3;
+    let test_data: Vec<u8> = (0..test_size).map(|x| x as u8).collect();
+    // let test_data: Vec<u8> = vec![55; test_size as usize];
+    // println!{"{test_data:#?}"};
     encoding::qoi_encode(
-        pixel_data, 
+        test_data, 
         encoding::QoiDesc{
-            width: image_width,
-            height: image_height,
+            width: res,
+            height: res,
             channels: 3,
             colorspace: 1
         });
+
     println!("Encoding done in: {:.2?}", timer_encode.elapsed());
 }

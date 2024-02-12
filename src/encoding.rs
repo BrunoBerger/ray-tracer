@@ -150,8 +150,25 @@ pub fn qoi_encode(data: Vec<u8>, desc: QoiDesc) {
         p+=1;
     }
 
+    println!{"sefsef{data:#?}"};
     
     let mut file = std::fs::File::create("image.qoi").unwrap();
     std::io::Write::write_all(&mut file, &bytes[..p]).unwrap();
 }
 
+pub fn test_encoding() {
+    let res: u32 = 20;
+    let size = res * res * 3;
+    let mut data: Vec<u8> = (0..size).map(|x| (x + 3) as u8).collect();
+    
+    qoi_encode(
+        data, 
+        QoiDesc{
+            width: res as u32,
+            height: res as u32,
+            channels: 3,
+            colorspace: 1
+        }
+    );
+
+}
